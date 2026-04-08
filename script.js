@@ -8,7 +8,7 @@
 const CONFIG = {
     // Tournament Info
     tournamentName: "2026 Chester River Catfish Tournament",
-    tournamentDate: "",                         // e.g., "June 14, 2026"
+    tournamentDate: "Saturday, August 29th, 2026",                         // e.g., "June 14, 2026"
     tournamentBanner: "images/catfish_tournament_logo.png",
 
     // Google Sheets CSV URLs
