@@ -101,6 +101,17 @@ body {
     font-weight: 700;
 }
 
+/* ---------- Disclaimer Banner ---------- */
+.disclaimer-banner {
+    text-align: center;
+    background: #fffbeb;
+    border-bottom: 2px solid #f6ad55;
+    color: #975a16;
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 0.3rem 0.5rem;
+}
+
 /* ---------- Main Container ---------- */
 .leaderboard-container {
     max-width: 1200px;
