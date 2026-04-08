@@ -289,30 +289,30 @@ function parseCSVLine(line) {
  * @returns {number} Total ounces for sorting
  */
 function parseWeight(weightStr) {
-    // Try "X lbs Y oz" format (most common)
-    const match = weightStr.match(/(\d+)\s*(?:lbs?|pounds?)[\s.,]*(\d+)\s*(?:oz|ounces?)/i);
+    // Try "X lbs Y oz" format (most common) — supports decimals like "9 lbs 2.5 oz"
+    const match = weightStr.match(/([\d.]+)\s*(?:lbs?|pounds?)[\s.,]*([\d.]+)\s*(?:oz|ounces?)/i);
     if (match) {
-        const pounds = parseInt(match[1], 10) || 0;
-        const ounces = parseInt(match[2], 10) || 0;
+        const pounds = parseFloat(match[1]) || 0;
+        const ounces = parseFloat(match[2]) || 0;
         return (pounds * 16) + ounces;
     }
 
-    // Try just pounds: "12 lbs"
-    const lbsOnly = weightStr.match(/(\d+)\s*(?:lbs?|pounds?)/i);
+    // Try just pounds: "12 lbs" or "12.5 lbs"
+    const lbsOnly = weightStr.match(/([\d.]+)\s*(?:lbs?|pounds?)/i);
     if (lbsOnly) {
-        return parseInt(lbsOnly[1], 10) * 16;
+        return parseFloat(lbsOnly[1]) * 16;
     }
 
-    // Try just ounces: "8 oz"
-    const ozOnly = weightStr.match(/(\d+)\s*(?:oz|ounces?)/i);
+    // Try just ounces: "8 oz" or "8.5 oz"
+    const ozOnly = weightStr.match(/([\d.]+)\s*(?:oz|ounces?)/i);
     if (ozOnly) {
-        return parseInt(ozOnly[1], 10);
+        return parseFloat(ozOnly[1]);
     }
 
     // Try numeric value (assume pounds)
     const numOnly = parseFloat(weightStr);
     if (!isNaN(numOnly)) {
-        return Math.round(numOnly * 16);
+        return numOnly * 16;
     }
 
     return 0;
