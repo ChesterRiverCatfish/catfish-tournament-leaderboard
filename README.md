@@ -9,10 +9,13 @@ A live, auto-refreshing leaderboard for catfish tournaments. Officials enter dat
   - Blue/Flathead Catfish (top 3 win prizes 🥇🥈🥉)
   - 3 Fish Stringer (top 3 win prizes 🥇🥈🥉)
 - **Junior Division** — 1 combined leaderboard (top 4 win prizes 🥇🥈🥉🏅)
+- **Top 10 display** — Only the top 10 entries per category/division are shown (configurable)
 - **Auto-refresh** every 2 minutes
-- **Mobile-first** responsive design
+- **Mobile-first** responsive design with light theme optimized for outdoor/sunlight viewing
 - **Social media sharing** with Open Graph meta tags for rich Facebook previews
-- **Customizable** tournament name, date, banner image, and sponsors
+- **Unofficial results disclaimer** banner displayed below the header
+- **Google Analytics (GA4)** tracking for visitor/traffic insights
+- **Customizable** tournament name, date, banner image, sponsors, and display limits
 - **No backend required** — Google Sheets is the database
 
 ---
@@ -41,7 +44,7 @@ A live, auto-refreshing leaderboard for catfish tournaments. Officials enter dat
    |------|--------|
    | John Smith | 12 lbs 8 oz |
    | Jane Doe | 9 lbs 4 oz |
-   | Bob Wilson | 7 lbs 2 oz |
+   | Bob Wilson | 4.14 lbs |
 
 ### Step 2: Publish the Google Sheet
 
@@ -67,7 +70,7 @@ const CONFIG = {
     // Tournament Info
     tournamentName: "Your Tournament Name Here",
     tournamentDate: "June 14, 2026",
-    tournamentBanner: "images/tournament-banner.jpg",
+    tournamentBanner: "images/catfish_tournament_logo.png",
 
     // Paste your Google Sheets CSV URLs here
     sheets: {
@@ -79,6 +82,9 @@ const CONFIG = {
 
     // Refresh interval in minutes
     refreshInterval: 2,
+
+    // Maximum entries to display per category/division (0 = show all)
+    maxDisplay: 10,
 
     // Sponsors (optional)
     sponsors: [
@@ -94,24 +100,44 @@ const CONFIG = {
 ### Step 4: Add Images (Optional)
 
 1. Create an `images/` folder in the project directory
-2. Add your tournament banner image as `images/tournament-banner.jpg`
+2. Add your tournament banner/logo image (e.g., `images/catfish_tournament_logo.png`)
 3. For sponsors, create `images/sponsors/` and add logo images
 4. Update the file paths in the `CONFIG` section if needed
 
-### Step 5: Update Open Graph Meta Tags
+### Step 5: Set Up Google Analytics (Optional)
+
+The page includes Google Analytics GA4 tracking. To use your own:
+
+1. Go to [analytics.google.com](https://analytics.google.com) and create a property
+2. Get your **Measurement ID** (looks like `G-XXXXXXXXXX`)
+3. In `index.html`, find the Google Analytics section in `<head>` and replace the Measurement ID:
+
+```html
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-YOUR_ID_HERE"></script>
+<script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-YOUR_ID_HERE');
+</script>
+```
+
+This tracks real-time visitors, traffic sources (Facebook vs direct), device types, and more.
+
+### Step 6: Update Open Graph Meta Tags
 
 For the best Facebook sharing preview, edit `index.html` and update these meta tags:
 
 ```html
 <meta property="og:title" content="Your Tournament Name — Live Leaderboard">
 <meta property="og:description" content="Live standings for Your Tournament Name!">
-<meta property="og:image" content="https://YOUR-GITHUB-USERNAME.github.io/catfish-tournament-leaderboard/images/tournament-banner.jpg">
+<meta property="og:image" content="https://YOUR-GITHUB-USERNAME.github.io/catfish-tournament-leaderboard/images/catfish_tournament_logo.png">
 <meta property="og:url" content="https://YOUR-GITHUB-USERNAME.github.io/catfish-tournament-leaderboard/">
 ```
 
 > **Note:** The `og:image` URL must be a full absolute URL for Facebook to display it.
 
-### Step 6: Deploy to GitHub Pages
+### Step 7: Deploy to GitHub Pages
 
 1. Create a new repository on [GitHub](https://github.com) (e.g., `catfish-tournament-leaderboard`)
 2. Upload all project files:
@@ -128,7 +154,7 @@ For the best Facebook sharing preview, edit `index.html` and update these meta t
    https://YOUR-GITHUB-USERNAME.github.io/catfish-tournament-leaderboard/
    ```
 
-### Step 7: Share on Social Media
+### Step 8: Share on Social Media
 
 Copy the GitHub Pages URL and share it on Facebook, Twitter, or any social media platform. The Open Graph meta tags will generate a rich preview card.
 
@@ -139,7 +165,9 @@ Copy the GitHub Pages URL and share it on Facebook, Twitter, or any social media
 1. **Officials** open the Google Sheet on a phone, tablet, or laptop
 2. Enter each weigh-in: type the angler's **Name** and **Weight** (e.g., `14 lbs 6 oz`)
 3. The leaderboard website **auto-refreshes every 2 minutes** to show the latest standings
-4. Viewers on Facebook can tap the shared link anytime to see live results
+4. Only the **top 10** entries per category are displayed (configurable via `maxDisplay`)
+5. Viewers on Facebook can tap the shared link anytime to see live results
+6. A disclaimer banner notes **"These are unofficial results"**
 
 ---
 
@@ -148,17 +176,41 @@ Copy the GitHub Pages URL and share it on Facebook, Twitter, or any social media
 ### Refresh Interval
 Change `refreshInterval` in the CONFIG section. Value is in minutes.
 
+### Display Limit
+Change `maxDisplay` in the CONFIG section to control how many entries are shown per category/division:
+- `10` — Show top 10 (default)
+- `20` — Show top 20
+- `0` — Show all entries (no limit)
+
 ### Weight Format
-The parser supports flexible weight formats:
+The parser supports flexible weight formats, including decimals:
 - `12 lbs 8 oz` (recommended)
+- `9 lbs 2.5 oz` (decimal ounces supported)
 - `12 lb 8 oz`
 - `12lbs 8oz`
 - `12 pounds 8 ounces`
+- `4.14 lbs` (decimal pounds, no ounces)
 - `12 lbs` (ounces default to 0)
 - `8 oz` (pounds default to 0)
 
+### Disclaimer Banner
+The disclaimer text "⚠️ These are unofficial results." is in `index.html`. Edit or remove the `<div class="disclaimer-banner">` element as needed.
+
 ### Styling
-Edit `styles.css` to change colors, fonts, and layout. The design uses CSS custom properties and is easy to modify.
+Edit `styles.css` to change colors, fonts, and layout. The design uses a light color scheme optimized for outdoor/sunlight viewing on mobile devices.
+
+---
+
+## Cache Busting for Updates
+
+When you update `styles.css` or `script.js` and push to GitHub Pages, browsers may cache the old files. To force a refresh:
+
+1. In `index.html`, increment the `?v=` query parameter on the CSS and JS references:
+   ```html
+   <link rel="stylesheet" href="styles.css?v=11">
+   <script src="script.js?v=7"></script>
+   ```
+2. Push the updated `index.html` along with your changed CSS/JS files.
 
 ---
 
@@ -166,12 +218,12 @@ Edit `styles.css` to change colors, fonts, and layout. The design uses CSS custo
 
 ```
 catfish-tournament-leaderboard/
-├── index.html          # Main page — layout, meta tags
-├── styles.css          # All styles — responsive, mobile-first
-├── script.js           # All logic — fetch, parse, sort, render
+├── index.html          # Main page — layout, meta tags, GA4 tracking
+├── styles.css          # All styles — responsive, mobile-first, light theme
+├── script.js           # All logic — fetch, parse, sort, render, auto-refresh
 ├── README.md           # This file — setup instructions
 ├── images/             # Tournament images
-│   ├── tournament-banner.jpg
+│   ├── catfish_tournament_logo.png
 │   └── sponsors/       # Sponsor logos
 │       ├── sponsor1.png
 │       └── sponsor2.png
@@ -191,12 +243,18 @@ catfish-tournament-leaderboard/
 
 ### Weight not sorting correctly?
 - Use the recommended format: `X lbs Y oz` (e.g., `12 lbs 8 oz`)
+- Decimal values are supported: `9 lbs 2.5 oz` or `4.14 lbs`
 - Make sure there are no extra spaces or special characters
 
 ### Changes not showing on the leaderboard?
 - Google Sheets publish-to-web can have a delay of 1-5 minutes
 - The leaderboard polls every 2 minutes by default
 - Try a hard refresh in your browser: `Ctrl + Shift + R`
+
+### Changes not showing after GitHub push?
+- Increment the `?v=` cache-busting parameter on CSS/JS references in `index.html`
+- GitHub Pages can take 1-2 minutes to deploy after a push
+- Try `Ctrl + Shift + R` to force a hard refresh
 
 ### Facebook not showing the preview image?
 - The `og:image` URL must be an absolute URL (starting with `https://`)
