@@ -1,0 +1,401 @@
+/* ============================================
+   Catfish Tournament Live Leaderboard - Styles
+   Mobile-first responsive design
+   ============================================ */
+
+/* ---------- Reset & Base ---------- */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    font-size: 16px;
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    background: linear-gradient(135deg, #0a1628 0%, #0d2137 50%, #0a2a1a 100%);
+    color: #e8f0f8;
+    min-height: 100vh;
+    line-height: 1.5;
+}
+
+/* ---------- Header ---------- */
+.tournament-header {
+    background: linear-gradient(180deg, #0b1e36 0%, #122a47 100%);
+    border-bottom: 3px solid #1a8a5c;
+    text-align: center;
+    padding: 1rem 1rem 1.5rem;
+}
+
+.header-content {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.tournament-banner {
+    max-width: 100%;
+    max-height: 200px;
+    object-fit: contain;
+    border-radius: 8px;
+    margin-bottom: 0.75rem;
+}
+
+.tournament-name {
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: #ffffff;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+    margin-bottom: 0.25rem;
+}
+
+.tournament-date {
+    font-size: 1rem;
+    color: #7fbfdf;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+}
+
+.tournament-date:empty {
+    display: none;
+}
+
+.live-badge {
+    display: inline-block;
+    background: rgba(220, 38, 38, 0.15);
+    border: 1px solid rgba(220, 38, 38, 0.4);
+    color: #ff6b6b;
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    padding: 0.3rem 1rem;
+    border-radius: 20px;
+    margin-bottom: 0.5rem;
+    animation: pulse-glow 2s ease-in-out infinite;
+}
+
+@keyframes pulse-glow {
+    0%, 100% { box-shadow: 0 0 4px rgba(220, 38, 38, 0.2); }
+    50% { box-shadow: 0 0 12px rgba(220, 38, 38, 0.5); }
+}
+
+.last-updated {
+    font-size: 0.8rem;
+    color: #6b8faa;
+}
+
+/* ---------- Main Container ---------- */
+.leaderboard-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 1rem;
+}
+
+/* ---------- Divisions ---------- */
+.division {
+    margin-bottom: 2rem;
+}
+
+.division-title {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #4fd1a5;
+    text-align: center;
+    padding: 0.75rem;
+    margin-bottom: 1rem;
+    border-bottom: 2px solid rgba(79, 209, 165, 0.3);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.junior-division .division-title {
+    color: #4db8ff;
+    border-bottom-color: rgba(77, 184, 255, 0.3);
+}
+
+/* ---------- Category Sections ---------- */
+.category-section {
+    margin-bottom: 1.5rem;
+}
+
+.category-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #a0d8ef;
+    text-align: center;
+    padding: 0.5rem;
+    background: rgba(26, 138, 92, 0.15);
+    border-left: 4px solid #1a8a5c;
+    border-radius: 0 6px 6px 0;
+    margin-bottom: 0.5rem;
+}
+
+.prize-note {
+    text-align: center;
+    font-size: 0.8rem;
+    color: #c9a84c;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+/* ---------- Tables ---------- */
+.table-wrapper {
+    overflow-x: auto;
+    border-radius: 8px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+}
+
+.leaderboard-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #0e1f35;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.leaderboard-table thead th {
+    background: #142d4a;
+    color: #7fbfdf;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 0.6rem 0.75rem;
+    text-align: left;
+    border-bottom: 2px solid #1a8a5c;
+}
+
+.leaderboard-table tbody tr {
+    transition: background-color 0.2s ease;
+}
+
+.leaderboard-table tbody tr:nth-child(even) {
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.leaderboard-table tbody tr:hover {
+    background: rgba(79, 209, 165, 0.08);
+}
+
+.leaderboard-table tbody td {
+    padding: 0.6rem 0.75rem;
+    font-size: 0.9rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* Column widths */
+.col-rank {
+    width: 70px;
+    text-align: center;
+}
+
+.col-name {
+    width: auto;
+}
+
+.col-weight {
+    width: 120px;
+    text-align: right;
+}
+
+.leaderboard-table tbody .col-rank {
+    text-align: center;
+    font-weight: 700;
+}
+
+.leaderboard-table tbody .col-weight {
+    text-align: right;
+    font-weight: 600;
+    color: #a0d8ef;
+    font-variant-numeric: tabular-nums;
+}
+
+/* ---------- Prize Rows ---------- */
+.prize-row-1 {
+    background: rgba(255, 215, 0, 0.08) !important;
+    border-left: 3px solid #ffd700;
+}
+
+.prize-row-2 {
+    background: rgba(192, 192, 192, 0.06) !important;
+    border-left: 3px solid #c0c0c0;
+}
+
+.prize-row-3 {
+    background: rgba(205, 127, 50, 0.06) !important;
+    border-left: 3px solid #cd7f32;
+}
+
+.prize-row-4 {
+    background: rgba(77, 184, 255, 0.06) !important;
+    border-left: 3px solid #4db8ff;
+}
+
+.rank-icon {
+    font-size: 1.1rem;
+    margin-right: 0.25rem;
+}
+
+/* ---------- Loading & Empty States ---------- */
+.loading-message,
+.empty-message,
+.error-message {
+    text-align: center;
+    padding: 1.5rem;
+    color: #6b8faa;
+    font-style: italic;
+}
+
+.error-message {
+    color: #ff6b6b;
+}
+
+/* ---------- Sponsors Section ---------- */
+.sponsors-section {
+    max-width: 800px;
+    margin: 0 auto 2rem;
+    padding: 1.5rem 1rem;
+    text-align: center;
+}
+
+.sponsors-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #c9a84c;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid rgba(201, 168, 76, 0.3);
+}
+
+.sponsors-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1.5rem;
+    align-items: center;
+}
+
+.sponsor-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.4rem;
+    text-decoration: none;
+    color: #a0d8ef;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.sponsor-item:hover {
+    transform: scale(1.05);
+    opacity: 0.85;
+}
+
+.sponsor-logo {
+    max-width: 100px;
+    max-height: 60px;
+    object-fit: contain;
+    border-radius: 4px;
+}
+
+.sponsor-name {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #7fbfdf;
+}
+
+.sponsors-section:empty,
+.sponsors-grid:empty {
+    display: none;
+}
+
+/* ---------- Footer ---------- */
+.site-footer {
+    text-align: center;
+    padding: 1.5rem 1rem;
+    background: #081420;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    color: #4a6a80;
+    font-size: 0.8rem;
+}
+
+.site-footer p {
+    margin-bottom: 0.25rem;
+}
+
+.footer-refresh {
+    font-size: 0.7rem;
+    color: #3a5568;
+}
+
+/* ---------- Responsive Breakpoints ---------- */
+
+/* Tablets and up */
+@media (min-width: 600px) {
+    .tournament-banner {
+        max-height: 280px;
+    }
+
+    .tournament-name {
+        font-size: 2rem;
+    }
+
+    .tournament-date {
+        font-size: 1.15rem;
+    }
+
+    .division-title {
+        font-size: 1.6rem;
+    }
+
+    .category-title {
+        font-size: 1.2rem;
+    }
+
+    .leaderboard-table thead th {
+        font-size: 0.8rem;
+        padding: 0.75rem 1rem;
+    }
+
+    .leaderboard-table tbody td {
+        padding: 0.75rem 1rem;
+        font-size: 1rem;
+    }
+
+    .sponsor-logo {
+        max-width: 130px;
+        max-height: 80px;
+    }
+}
+
+/* Desktop */
+@media (min-width: 900px) {
+    .tournament-banner {
+        max-height: 350px;
+    }
+
+    .tournament-name {
+        font-size: 2.4rem;
+    }
+
+    .leaderboard-container {
+        padding: 1.5rem 2rem;
+    }
+
+    .sponsors-grid {
+        gap: 2rem;
+    }
+
+    .sponsor-logo {
+        max-width: 160px;
+        max-height: 100px;
+    }
+}
