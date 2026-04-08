@@ -31,10 +31,7 @@ body {
     background: linear-gradient(180deg, #ffffff 0%, #e8f4f8 100%);
     border-bottom: 4px solid #1a6b3c;
     text-align: center;
-    padding: 0.75rem 0.75rem 1rem;
-    position: sticky;
-    top: 0;
-    z-index: 100;
+    padding: 0.5rem 0.5rem 0.5rem;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
@@ -45,30 +42,39 @@ body {
 
 .tournament-banner {
     max-width: 100%;
-    max-height: 80px;
+    max-height: 50px;
     object-fit: contain;
-    border-radius: 8px;
-    margin-bottom: 0.4rem;
+    border-radius: 6px;
+    margin-bottom: 0.2rem;
 }
 
 .tournament-name {
-    font-size: 1.3rem;
+    font-size: 1.1rem;
     font-weight: 900;
     color: #0d3b1e;
     text-transform: uppercase;
     letter-spacing: 1px;
-    margin-bottom: 0.15rem;
+    margin-bottom: 0.1rem;
+    line-height: 1.2;
 }
 
 .tournament-date {
-    font-size: 0.9rem;
+    font-size: 0.75rem;
     color: #2a6496;
     font-weight: 700;
-    margin-bottom: 0.4rem;
+    margin-bottom: 0.2rem;
 }
 
 .tournament-date:empty {
     display: none;
+}
+
+.header-status-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
 }
 
 .live-badge {
@@ -76,12 +82,11 @@ body {
     background: #fde8e8;
     border: 2px solid #e53e3e;
     color: #c53030;
-    font-size: 0.7rem;
+    font-size: 0.6rem;
     font-weight: 800;
     letter-spacing: 2px;
-    padding: 0.2rem 0.75rem;
+    padding: 0.15rem 0.5rem;
     border-radius: 20px;
-    margin-bottom: 0.3rem;
     animation: pulse-glow 2s ease-in-out infinite;
 }
 
@@ -91,7 +96,7 @@ body {
 }
 
 .last-updated {
-    font-size: 0.7rem;
+    font-size: 0.6rem;
     color: #4a5568;
     font-weight: 700;
 }
@@ -359,13 +364,12 @@ body {
     }
 
     .tournament-header {
-        position: relative;
-        padding: 1rem 1rem 1.5rem;
-        box-shadow: none;
+        padding: 1rem 1rem 1.25rem;
     }
 
     .tournament-banner {
-        max-height: 140px;
+        max-height: 120px;
+        margin-bottom: 0.4rem;
     }
 
     .tournament-name {
@@ -373,7 +377,16 @@ body {
     }
 
     .tournament-date {
-        font-size: 1.15rem;
+        font-size: 1.1rem;
+    }
+
+    .live-badge {
+        font-size: 0.7rem;
+        padding: 0.2rem 0.75rem;
+    }
+
+    .last-updated {
+        font-size: 0.7rem;
     }
 
     .division-title {

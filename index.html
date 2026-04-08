@@ -16,7 +16,7 @@
     <meta name="twitter:description" content="Live standings for the Chester River Catfish Tournament — Channel Catfish, Blue/Flathead, 3 Fish Stringer, and Junior divisions!">
     <meta name="twitter:image" content="images/catfish_tournament_logo.png">
 
-    <link rel="stylesheet" href="styles.css?v=6">
+    <link rel="stylesheet" href="styles.css?v=7">
 </head>
 <body>
 
@@ -26,8 +26,10 @@
             <img id="tournament-banner" class="tournament-banner" src="images/catfish_tournament_logo.png" alt="Tournament Banner" onerror="this.style.display='none'">
             <h1 id="tournament-name" class="tournament-name">Catfish Tournament</h1>
             <p id="tournament-date" class="tournament-date"></p>
-            <div class="live-badge">🔴 LIVE LEADERBOARD</div>
-            <p class="last-updated">Last Updated: <span id="last-updated">Loading...</span></p>
+            <div class="header-status-row">
+                <span class="live-badge">🔴 LIVE</span>
+                <span class="last-updated">Updated: <span id="last-updated">Loading...</span></span>
+            </div>
         </div>
     </header>
 
