@@ -12,6 +12,7 @@ A live, auto-refreshing leaderboard for catfish tournaments. Officials enter dat
 - **Top 10 display** — Only the top 10 entries per category/division are shown (configurable)
 - **Auto-refresh** every 2 minutes
 - **Mobile-first** responsive design with light theme optimized for outdoor/sunlight viewing
+- **Live / Before / After status toggle** — controlled from Google Sheets, no code changes needed
 - **Social media sharing** with Open Graph meta tags for rich Facebook previews
 - **Unofficial results disclaimer** banner displayed below the header
 - **Google Analytics (GA4)** tracking for visitor/traffic insights
@@ -25,19 +26,31 @@ A live, auto-refreshing leaderboard for catfish tournaments. Officials enter dat
 ### Step 1: Create the Google Sheet
 
 1. Go to [Google Sheets](https://sheets.google.com) and create a new spreadsheet
-2. Create **4 tabs** (rename the sheet tabs at the bottom):
+2. Create **5 tabs** (rename the sheet tabs at the bottom):
    - `Channel Catfish`
    - `Blue/Flathead Catfish`
    - `3 Fish Stringer`
    - `Junior`
+   - `Settings`
 
-3. In each tab, add these column headers in **Row 1**:
+3. In the **Settings** tab, add a status control:
+
+   | A | B |
+   |---|---|
+   | **status** | **before** |
+
+   Change cell B1 to control the leaderboard status badge:
+   - `before` → 📋 WEIGH-INS COMING SOON (blue badge)
+   - `live` → 🔴 LIVE (red pulsing badge)
+   - `after` → 🏁 FINAL RESULTS (green badge)
+
+4. In each of the other 4 tabs, add these column headers in **Row 1**:
 
    | A | B |
    |---|---|
    | **Name** | **Weight** |
 
-4. Enter fish data below the headers. Weight format: `X lbs Y oz`
+5. Enter fish data below the headers. Weight format: `X lbs Y oz`
 
    Example:
    | Name | Weight |
@@ -58,7 +71,7 @@ A live, auto-refreshing leaderboard for catfish tournaments. Officials enter dat
    ```
    https://docs.google.com/spreadsheets/d/e/2PACX-XXXX.../pub?gid=0&single=true&output=csv
    ```
-4. Repeat for all 4 tabs. Note which URL goes with which tab.
+4. Repeat for all **5 tabs** (including Settings). Note which URL goes with which tab.
 
 ### Step 3: Configure the Leaderboard
 
@@ -77,7 +90,8 @@ const CONFIG = {
         channelCatfish:   "https://docs.google.com/spreadsheets/d/e/.../pub?gid=0&single=true&output=csv",
         blueFlathead:     "https://docs.google.com/spreadsheets/d/e/.../pub?gid=123456&single=true&output=csv",
         stringer:         "https://docs.google.com/spreadsheets/d/e/.../pub?gid=789012&single=true&output=csv",
-        junior:           "https://docs.google.com/spreadsheets/d/e/.../pub?gid=345678&single=true&output=csv"
+        junior:           "https://docs.google.com/spreadsheets/d/e/.../pub?gid=345678&single=true&output=csv",
+        settings:         "https://docs.google.com/spreadsheets/d/e/.../pub?gid=SETTINGS_GID&single=true&output=csv"
     },
 
     // Refresh interval in minutes
@@ -162,12 +176,15 @@ Copy the GitHub Pages URL and share it on Facebook, Twitter, or any social media
 
 ## During the Tournament
 
-1. **Officials** open the Google Sheet on a phone, tablet, or laptop
-2. Enter each weigh-in: type the angler's **Name** and **Weight** (e.g., `14 lbs 6 oz`)
-3. The leaderboard website **auto-refreshes every 2 minutes** to show the latest standings
-4. Only the **top 10** entries per category are displayed (configurable via `maxDisplay`)
-5. Viewers on Facebook can tap the shared link anytime to see live results
-6. A disclaimer banner notes **"These are unofficial results"**
+1. **Before the tournament** — Set the Settings tab status to `before`. The badge shows "📋 WEIGH-INS COMING SOON"
+2. **Tournament starts** — Change the status to `live`. The badge switches to "🔴 LIVE" with a pulsing animation
+3. **Officials** open the Google Sheet on a phone, tablet, or laptop
+4. Enter each weigh-in: type the angler's **Name** and **Weight** (e.g., `14 lbs 6 oz`)
+5. The leaderboard website **auto-refreshes every 2 minutes** to show the latest standings
+6. Only the **top 10** entries per category are displayed (configurable via `maxDisplay`)
+7. Viewers on Facebook can tap the shared link anytime to see live results
+8. A disclaimer banner notes **"These are unofficial results"**
+9. **Tournament ends** — Change the status to `after`. The badge shows "🏁 FINAL RESULTS" and auto-refresh continues checking the setting
 
 ---
 
@@ -175,6 +192,20 @@ Copy the GitHub Pages URL and share it on Facebook, Twitter, or any social media
 
 ### Refresh Interval
 Change `refreshInterval` in the CONFIG section. Value is in minutes.
+
+### Tournament Status (Live / Before / After)
+Change the status badge from your Google Sheet — no code changes needed:
+1. Go to the **Settings** tab in your Google Sheet
+2. Change cell **B1** to one of: `before`, `live`, or `after`
+3. The leaderboard picks up the change on the next auto-refresh (every 2 minutes)
+
+| Value | Badge | Color |
+|---|---|---|
+| `before` | 📋 WEIGH-INS COMING SOON | Blue (static) |
+| `live` | 🔴 LIVE | Red (pulsing) |
+| `after` | 🏁 FINAL RESULTS | Green (static) |
+
+If the Settings URL is not configured, the badge defaults to "🔴 LIVE".
 
 ### Display Limit
 Change `maxDisplay` in the CONFIG section to control how many entries are shown per category/division:
