@@ -90,6 +90,20 @@ body {
     animation: pulse-glow 2s ease-in-out infinite;
 }
 
+.live-badge.before {
+    background: #ebf8ff;
+    border-color: #3182ce;
+    color: #2b6cb0;
+    animation: none;
+}
+
+.live-badge.final {
+    background: #f0fff4;
+    border-color: #38a169;
+    color: #276749;
+    animation: none;
+}
+
 @keyframes pulse-glow {
     0%, 100% { box-shadow: 0 0 4px rgba(229, 62, 62, 0.2); }
     50% { box-shadow: 0 0 12px rgba(229, 62, 62, 0.4); }

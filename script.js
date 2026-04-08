@@ -18,7 +18,8 @@ const CONFIG = {
         channelCatfish:   "https://docs.google.com/spreadsheets/d/e/2PACX-1vSesRUtCsBmtAUfXuJIQ9A_MJCESJC2Tbe2WWOJpx-tpvjwqTk2lUBsl_vN-SzSwimkiv5NwTk4Ioo9/pub?gid=0&single=true&output=csv",
         blueFlathead:     "https://docs.google.com/spreadsheets/d/e/2PACX-1vSesRUtCsBmtAUfXuJIQ9A_MJCESJC2Tbe2WWOJpx-tpvjwqTk2lUBsl_vN-SzSwimkiv5NwTk4Ioo9/pub?gid=1954833042&single=true&output=csv",
         stringer:         "https://docs.google.com/spreadsheets/d/e/2PACX-1vSesRUtCsBmtAUfXuJIQ9A_MJCESJC2Tbe2WWOJpx-tpvjwqTk2lUBsl_vN-SzSwimkiv5NwTk4Ioo9/pub?gid=1361461277&single=true&output=csv",
-        junior:           "https://docs.google.com/spreadsheets/d/e/2PACX-1vSesRUtCsBmtAUfXuJIQ9A_MJCESJC2Tbe2WWOJpx-tpvjwqTk2lUBsl_vN-SzSwimkiv5NwTk4Ioo9/pub?gid=1116047246&single=true&output=csv"
+        junior:           "https://docs.google.com/spreadsheets/d/e/2PACX-1vSesRUtCsBmtAUfXuJIQ9A_MJCESJC2Tbe2WWOJpx-tpvjwqTk2lUBsl_vN-SzSwimkiv5NwTk4Ioo9/pub?gid=1116047246&single=true&output=csv",
+        settings:         "https://docs.google.com/spreadsheets/d/e/2PACX-1vSesRUtCsBmtAUfXuJIQ9A_MJCESJC2Tbe2WWOJpx-tpvjwqTk2lUBsl_vN-SzSwimkiv5NwTk4Ioo9/pub?gid=822712516&single=true&output=csv"
     },
 
     // Refresh interval in minutes
@@ -43,9 +44,13 @@ const CONFIG = {
 // =============================================
 // INITIALIZATION
 // =============================================
+// Track current tournament status
+let tournamentStatus = 'live'; // default: 'before', 'live', or 'after'
+let refreshTimerId = null;
+
 document.addEventListener('DOMContentLoaded', () => {
     applyConfig();
-    loadAllData();
+    fetchSettingsAndRefresh();
     startAutoRefresh();
 });
 
@@ -397,13 +402,83 @@ function updateTimestamp() {
 }
 
 /**
+ * Fetch the Settings tab from Google Sheets and update the badge
+ * Settings tab format: Row 1 = headers (status), Row 2 = value (before/live/after)
+ */
+async function fetchSettings() {
+    const settingsUrl = CONFIG.sheets.settings;
+    if (!settingsUrl) {
+        // No settings URL configured — default to 'live'
+        return 'live';
+    }
+
+    try {
+        const cacheBuster = `_cb=${Date.now()}`;
+        const separator = settingsUrl.includes('?') ? '&' : '?';
+        const fetchUrl = `${settingsUrl}${separator}${cacheBuster}`;
+        const response = await fetch(fetchUrl, { cache: 'no-store' });
+        const text = await response.text();
+
+        // Parse simple CSV: first row is header, second row is value
+        const lines = text.trim().split('\n');
+        if (lines.length >= 2) {
+            const value = lines[1].trim().toLowerCase().replace(/['"]/g, '');
+            if (['before', 'live', 'after'].includes(value)) {
+                return value;
+            }
+        }
+    } catch (err) {
+        console.warn('Could not fetch settings:', err);
+    }
+
+    return tournamentStatus; // Keep current status on error
+}
+
+/**
+ * Update the status badge based on tournament state
+ */
+function updateBadge(status) {
+    const badge = document.getElementById('status-badge');
+    if (!badge) return;
+
+    // Remove all state classes
+    badge.classList.remove('before', 'final');
+
+    switch (status) {
+        case 'before':
+            badge.textContent = '📋 WEIGH-INS COMING SOON';
+            badge.classList.add('before');
+            break;
+        case 'after':
+            badge.textContent = '🏁 FINAL RESULTS';
+            badge.classList.add('final');
+            break;
+        case 'live':
+        default:
+            badge.textContent = '🔴 LIVE';
+            break;
+    }
+}
+
+/**
+ * Fetch settings, update badge, then load leaderboard data
+ */
+async function fetchSettingsAndRefresh() {
+    const newStatus = await fetchSettings();
+    tournamentStatus = newStatus;
+    updateBadge(tournamentStatus);
+    await loadAllData();
+}
+
+/**
  * Start the auto-refresh timer
  */
 function startAutoRefresh() {
     const intervalMs = (CONFIG.refreshInterval || 2) * 60 * 1000;
 
-    setInterval(() => {
+    refreshTimerId = setInterval(() => {
+        // Always check settings (even in 'after' mode, in case they switch back)
         console.log('Auto-refreshing leaderboard data...');
-        loadAllData();
+        fetchSettingsAndRefresh();
     }, intervalMs);
 }
