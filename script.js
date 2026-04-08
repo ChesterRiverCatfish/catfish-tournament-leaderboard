@@ -419,12 +419,29 @@ async function fetchSettings() {
         const response = await fetch(fetchUrl, { cache: 'no-store' });
         const text = await response.text();
 
-        // Parse simple CSV: first row is header, second row is value
+        // Parse settings CSV — supports two layouts:
+        // Layout 1 (key,value on same row): "status,before"
+        // Layout 2 (header + data rows): "status\nbefore"
         const lines = text.trim().split('\n');
-        if (lines.length >= 2) {
-            const value = lines[1].trim().toLowerCase().replace(/['"]/g, '');
-            if (['before', 'live', 'after'].includes(value)) {
-                return value;
+        
+        if (lines.length >= 1) {
+            // Check if first line has a comma (Layout 1: key,value)
+            const firstLineParts = lines[0].split(',').map(p => p.trim().toLowerCase().replace(/['"]/g, ''));
+            
+            // Layout 1: "status,before" — value is in column B
+            if (firstLineParts.length >= 2) {
+                const value = firstLineParts[1];
+                if (['before', 'live', 'after'].includes(value)) {
+                    return value;
+                }
+            }
+            
+            // Layout 2: header row + data row — value is on line 2
+            if (lines.length >= 2) {
+                const value = lines[1].trim().toLowerCase().replace(/['"]/g, '');
+                if (['before', 'live', 'after'].includes(value)) {
+                    return value;
+                }
             }
         }
     } catch (err) {
