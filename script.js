@@ -33,6 +33,9 @@ const CONFIG = {
          { name: "Revere Seed", logo: "images/sponsors/REVERE_color_logo.png" },
     ],
 
+    // Maximum entries to display per category/division (0 = show all)
+    maxDisplay: 10,
+
     // Footer text
     footerText: "Catfish Tournament Leaderboard"
 };
@@ -333,7 +336,11 @@ function renderTable(tbody, entries, prizeCount) {
 
     const prizeIcons = ['🥇', '🥈', '🥉', '🏅'];
 
-    entries.forEach((entry, index) => {
+    // Limit to top N entries if configured
+    const maxDisplay = CONFIG.maxDisplay || 0;
+    const displayEntries = (maxDisplay > 0) ? entries.slice(0, maxDisplay) : entries;
+
+    displayEntries.forEach((entry, index) => {
         const rank = index + 1;
         const tr = document.createElement('tr');
 
