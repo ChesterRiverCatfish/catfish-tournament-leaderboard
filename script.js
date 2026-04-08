@@ -28,9 +28,9 @@ const CONFIG = {
     // Each sponsor: { name: "Sponsor Name", logo: "images/sponsor-logo.png", url: "https://example.com" }
     // The url and logo fields are optional
     sponsors: [
-        // { name: "Bait Shop Pro", logo: "images/sponsors/baitshop.png", url: "https://baitshoppro.com" },
-        // { name: "Lake Marina", logo: "images/sponsors/marina.png", url: "https://lakemarina.com" },
-        // { name: "Fishing Gear Co.", logo: "images/sponsors/fishinggear.png" },
+         { name: "Chestertown Animal Hospital", logo: "images/sponsors/Chestertown Animal Hospital Logo.png" },
+         { name: "Heller the Seller", logo: "images/sponsors/Heller the Seller.png" },
+         { name: "Revere Seed", logo: "images/sponsors/REVERE_color_logo.png" },
     ],
 
     // Footer text
