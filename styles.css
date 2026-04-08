@@ -34,13 +34,13 @@ body {
 }
 
 .header-content {
-    max-width: 800px;
+    max-width: 1200px;
     margin: 0 auto;
 }
 
 .tournament-banner {
     max-width: 100%;
-    max-height: 200px;
+    max-height: 120px;
     object-fit: contain;
     border-radius: 8px;
     margin-bottom: 0.75rem;
@@ -93,7 +93,7 @@ body {
 
 /* ---------- Main Container ---------- */
 .leaderboard-container {
-    max-width: 800px;
+    max-width: 1200px;
     margin: 0 auto;
     padding: 1rem;
 }
@@ -259,7 +259,7 @@ body {
 
 /* ---------- Sponsors Section ---------- */
 .sponsors-section {
-    max-width: 800px;
+    max-width: 1200px;
     margin: 0 auto 2rem;
     padding: 1.5rem 1rem;
     text-align: center;
@@ -341,7 +341,7 @@ body {
 /* Tablets and up */
 @media (min-width: 600px) {
     .tournament-banner {
-        max-height: 280px;
+        max-height: 140px;
     }
 
     .tournament-name {
@@ -376,10 +376,10 @@ body {
     }
 }
 
-/* Desktop */
+/* Desktop — side-by-side divisions */
 @media (min-width: 900px) {
     .tournament-banner {
-        max-height: 350px;
+        max-height: 160px;
     }
 
     .tournament-name {
@@ -387,7 +387,23 @@ body {
     }
 
     .leaderboard-container {
+        display: flex;
+        gap: 2rem;
+        align-items: stretch;
         padding: 1.5rem 2rem;
+    }
+
+    /* Equal width for both divisions */
+    .adult-division {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .junior-division {
+        flex: 1;
+        min-width: 0;
+        border-left: 2px solid rgba(79, 209, 165, 0.3);
+        padding-left: 2rem;
     }
 
     .sponsors-grid {

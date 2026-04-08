@@ -7,9 +7,9 @@
 // =============================================
 const CONFIG = {
     // Tournament Info
-    tournamentName: "Catfish Tournament",
+    tournamentName: "2026 Chester River Catfish Tournament",
     tournamentDate: "",                         // e.g., "June 14, 2026"
-    tournamentBanner: "images/tournament-banner.jpg",
+    tournamentBanner: "images/catfish_tournament_logo.png",
 
     // Google Sheets CSV URLs
     // Instructions: Publish each Google Sheet tab as CSV, then paste the URLs here
@@ -159,14 +159,29 @@ async function loadLeaderboard(csvUrl, tableId, prizeCount) {
     }
 
     try {
-        const response = await fetch(csvUrl);
+        // Add cache-busting parameter to prevent stale cached responses
+        const cacheBuster = '_cb=' + Date.now();
+        const separator = csvUrl.includes('?') ? '&' : '?';
+        const fetchUrl = csvUrl + separator + cacheBuster;
+
+        const response = await fetch(fetchUrl, {
+            cache: 'no-store',
+            headers: { 'Cache-Control': 'no-cache' }
+        });
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
         const csvText = await response.text();
         const entries = parseCSV(csvText);
 
+        // Only update the table if we got valid data
+        // This prevents wiping out good data if Google Sheets returns an empty response
         if (entries.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="3" class="empty-message">No entries yet</td></tr>';
+            // Only show "No entries" on initial load, not on refresh
+            const hasExistingData = tbody.querySelectorAll('tr:not(.loading-message):not(.empty-message):not(.error-message)').length > 0;
+            if (!hasExistingData) {
+                tbody.innerHTML = '<tr><td colspan="3" class="empty-message">No entries yet</td></tr>';
+            }
+            // If we already have data displayed, keep it and skip this empty update
             return;
         }
 
@@ -178,7 +193,14 @@ async function loadLeaderboard(csvUrl, tableId, prizeCount) {
 
     } catch (err) {
         console.error(`Error loading ${tableId}:`, err);
-        tbody.innerHTML = '<tr><td colspan="3" class="error-message">Unable to load data. Will retry on next refresh.</td></tr>';
+        // Only show error message if there's no existing data displayed
+        // This prevents wiping out good data on a transient network error
+        const existingRows = tbody.querySelectorAll('tr');
+        const hasRealData = existingRows.length > 0 &&
+            !existingRows[0].querySelector('.loading-message, .empty-message, .error-message');
+        if (!hasRealData) {
+            tbody.innerHTML = '<tr><td colspan="3" class="error-message">Unable to load data. Will retry on next refresh.</td></tr>';
+        }
     }
 }
 
