@@ -14,7 +14,7 @@
 }
 
 html {
-    font-size: 16px;
+    font-size: 18px;
     scroll-behavior: smooth;
 }
 
@@ -31,7 +31,11 @@ body {
     background: linear-gradient(180deg, #ffffff 0%, #e8f4f8 100%);
     border-bottom: 4px solid #1a6b3c;
     text-align: center;
-    padding: 1rem 1rem 1.5rem;
+    padding: 0.75rem 0.75rem 1rem;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .header-content {
@@ -41,26 +45,26 @@ body {
 
 .tournament-banner {
     max-width: 100%;
-    max-height: 120px;
+    max-height: 80px;
     object-fit: contain;
     border-radius: 8px;
-    margin-bottom: 0.75rem;
+    margin-bottom: 0.4rem;
 }
 
 .tournament-name {
-    font-size: 1.6rem;
-    font-weight: 800;
+    font-size: 1.3rem;
+    font-weight: 900;
     color: #0d3b1e;
     text-transform: uppercase;
     letter-spacing: 1px;
-    margin-bottom: 0.25rem;
+    margin-bottom: 0.15rem;
 }
 
 .tournament-date {
-    font-size: 1rem;
+    font-size: 0.9rem;
     color: #2a6496;
     font-weight: 700;
-    margin-bottom: 0.75rem;
+    margin-bottom: 0.4rem;
 }
 
 .tournament-date:empty {
@@ -72,12 +76,12 @@ body {
     background: #fde8e8;
     border: 2px solid #e53e3e;
     color: #c53030;
-    font-size: 0.85rem;
+    font-size: 0.7rem;
     font-weight: 800;
     letter-spacing: 2px;
-    padding: 0.3rem 1rem;
+    padding: 0.2rem 0.75rem;
     border-radius: 20px;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.3rem;
     animation: pulse-glow 2s ease-in-out infinite;
 }
 
@@ -87,9 +91,9 @@ body {
 }
 
 .last-updated {
-    font-size: 0.8rem;
+    font-size: 0.7rem;
     color: #4a5568;
-    font-weight: 600;
+    font-weight: 700;
 }
 
 /* ---------- Main Container ---------- */
@@ -105,8 +109,8 @@ body {
 }
 
 .division-title {
-    font-size: 1.4rem;
-    font-weight: 800;
+    font-size: 1.2rem;
+    font-weight: 900;
     color: #1a6b3c;
     text-align: center;
     padding: 0.75rem;
@@ -127,8 +131,8 @@ body {
 }
 
 .category-title {
-    font-size: 1.1rem;
-    font-weight: 800;
+    font-size: 1rem;
+    font-weight: 900;
     color: #1a1a2e;
     text-align: center;
     padding: 0.5rem;
@@ -140,10 +144,10 @@ body {
 
 .prize-note {
     text-align: center;
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     color: #b7791f;
-    font-weight: 700;
-    margin-bottom: 0.5rem;
+    font-weight: 800;
+    margin-bottom: 0.4rem;
 }
 
 /* ---------- Tables ---------- */
@@ -164,11 +168,11 @@ body {
 .leaderboard-table thead th {
     background: #1a6b3c;
     color: #ffffff;
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     font-weight: 800;
     text-transform: uppercase;
     letter-spacing: 1px;
-    padding: 0.6rem 0.75rem;
+    padding: 0.5rem 0.6rem;
     text-align: left;
     border-bottom: none;
 }
@@ -190,16 +194,16 @@ body {
 }
 
 .leaderboard-table tbody td {
-    padding: 0.6rem 0.75rem;
-    font-size: 0.9rem;
-    font-weight: 600;
+    padding: 0.55rem 0.6rem;
+    font-size: 0.85rem;
+    font-weight: 700;
     color: #1a1a2e;
     border-bottom: 1px solid #e2e8f0;
 }
 
 /* Column widths */
 .col-rank {
-    width: 70px;
+    width: 55px;
     text-align: center;
 }
 
@@ -215,12 +219,12 @@ body {
 
 .leaderboard-table tbody .col-rank {
     text-align: center;
-    font-weight: 800;
+    font-weight: 900;
 }
 
 .leaderboard-table tbody .col-weight {
     text-align: right;
-    font-weight: 700;
+    font-weight: 800;
     color: #1a5276;
     font-variant-numeric: tabular-nums;
 }
@@ -247,8 +251,8 @@ body {
 }
 
 .rank-icon {
-    font-size: 1.1rem;
-    margin-right: 0.25rem;
+    font-size: 1.2rem;
+    margin-right: 0.15rem;
 }
 
 /* ---------- Loading & Empty States ---------- */
@@ -350,6 +354,16 @@ body {
 
 /* Tablets and up */
 @media (min-width: 600px) {
+    html {
+        font-size: 16px;
+    }
+
+    .tournament-header {
+        position: relative;
+        padding: 1rem 1rem 1.5rem;
+        box-shadow: none;
+    }
+
     .tournament-banner {
         max-height: 140px;
     }
@@ -378,6 +392,10 @@ body {
     .leaderboard-table tbody td {
         padding: 0.75rem 1rem;
         font-size: 1rem;
+    }
+
+    .col-rank {
+        width: 70px;
     }
 
     .sponsor-logo {
