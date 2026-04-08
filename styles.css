@@ -208,8 +208,9 @@ body {
 }
 
 .col-weight {
-    width: 120px;
+    width: 130px;
     text-align: right;
+    white-space: nowrap;
 }
 
 .leaderboard-table tbody .col-rank {
