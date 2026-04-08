@@ -176,10 +176,10 @@ async function loadLeaderboard(csvUrl, tableId, prizeCount) {
         // Only update the table if we got valid data
         // This prevents wiping out good data if Google Sheets returns an empty response
         if (entries.length === 0) {
-            // Only show "No entries" on initial load, not on refresh
+            // Only show empty message on initial load, not on refresh
             const hasExistingData = tbody.querySelectorAll('tr:not(.loading-message):not(.empty-message):not(.error-message)').length > 0;
             if (!hasExistingData) {
-                tbody.innerHTML = '<tr><td colspan="3" class="empty-message">No entries yet</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="3" class="empty-message">🎣 No weigh-ins recorded yet — stay tuned!</td></tr>';
             }
             // If we already have data displayed, keep it and skip this empty update
             return;
