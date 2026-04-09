@@ -16,6 +16,7 @@
 html {
     font-size: 18px;
     scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
 }
 
 body {
@@ -84,7 +85,7 @@ body {
     color: #c53030;
     font-size: 0.6rem;
     font-weight: 800;
-    letter-spacing: 2px;
+    letter-spacing: 1px;
     padding: 0.15rem 0.5rem;
     border-radius: 20px;
     animation: pulse-glow 2s ease-in-out infinite;
@@ -219,8 +220,10 @@ body {
     background: #f8fafb;
 }
 
-.leaderboard-table tbody tr:hover {
-    background: #e6f7ed;
+@media (hover: hover) {
+    .leaderboard-table tbody tr:hover {
+        background: #e6f7ed;
+    }
 }
 
 .leaderboard-table tbody td {
@@ -242,7 +245,7 @@ body {
 }
 
 .col-weight {
-    width: 130px;
+    width: 105px;
     text-align: right;
     white-space: nowrap;
 }
@@ -334,12 +337,17 @@ body {
     gap: 0.4rem;
     text-decoration: none;
     color: #1a5276;
+    min-height: 44px;
+    min-width: 44px;
+    justify-content: center;
     transition: transform 0.2s ease, opacity 0.2s ease;
 }
 
-.sponsor-item:hover {
-    transform: scale(1.05);
-    opacity: 0.85;
+@media (hover: hover) {
+    .sponsor-item:hover {
+        transform: scale(1.05);
+        opacity: 0.85;
+    }
 }
 
 .sponsor-logo {
