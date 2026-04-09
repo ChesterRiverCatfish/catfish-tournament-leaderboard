@@ -33,15 +33,22 @@ A live, auto-refreshing leaderboard for catfish tournaments. Officials enter dat
    - `Junior`
    - `Settings`
 
-3. In the **Settings** tab, add a status control:
+3. In the **Settings** tab, add key-value settings (Column A = key, Column B = value):
 
-   | A | B |
+   | A (Key) | B (Value) |
    |---|---|
    | **status** | **before** |
+   | **tournamentName** | **2026 Chester River Catfish Tournament** |
+   | **tournamentDate** | **Saturday, August 29th, 2026** |
 
-   Change cell B1 to control the leaderboard status badge:
+   **Settings keys:**
+   - `status` → Controls the badge: `before`, `live`, or `after`
+   - `tournamentName` → Overrides the tournament name displayed in the header and page title
+   - `tournamentDate` → Overrides the tournament date displayed in the header
+
+   **Status values:**
    - `before` → 📋 WEIGH-INS COMING SOON (blue badge)
-   - `live` → 🔴 LIVE (red pulsing badge)
+   - `live` → 🔴 LIVE (red pulsing badge) + "⚠️ UNOFFICIAL RESULTS" disclaimer
    - `after` → 🏁 FINAL RESULTS (green badge)
 
 4. In each of the other 4 tabs, add these column headers in **Row 1**:
@@ -176,15 +183,15 @@ Copy the GitHub Pages URL and share it on Facebook, Twitter, or any social media
 
 ## During the Tournament
 
-1. **Before the tournament** — Set the Settings tab status to `before`. The badge shows "📋 WEIGH-INS COMING SOON"
-2. **Tournament starts** — Change the status to `live`. The badge switches to "🔴 LIVE" with a pulsing animation
+1. **Before the tournament** — Set the Settings tab status to `before`. The badge shows "📋 WEIGH-INS COMING SOON". No disclaimer banner is shown.
+2. **Tournament starts** — Change the status to `live`. The badge switches to "🔴 LIVE" with a pulsing animation. The "⚠️ UNOFFICIAL RESULTS" disclaimer banner appears.
 3. **Officials** open the Google Sheet on a phone, tablet, or laptop
 4. Enter each weigh-in: type the angler's **Name** and **Weight** (e.g., `14 lbs 6 oz`)
 5. The leaderboard website **auto-refreshes every 2 minutes** to show the latest standings
 6. Only the **top 10** entries per category are displayed (configurable via `maxDisplay`)
 7. Viewers on Facebook can tap the shared link anytime to see live results
-8. A disclaimer banner notes **"These are unofficial results"**
-9. **Tournament ends** — Change the status to `after`. The badge shows "🏁 FINAL RESULTS" and auto-refresh continues checking the setting
+8. The **"⚠️ UNOFFICIAL RESULTS"** disclaimer banner is displayed only in `live` mode
+9. **Tournament ends** — Change the status to `after`. The badge shows "🏁 FINAL RESULTS", the disclaimer hides, and auto-refresh continues checking the setting
 
 ---
 
@@ -196,16 +203,23 @@ Change `refreshInterval` in the CONFIG section. Value is in minutes.
 ### Tournament Status (Live / Before / After)
 Change the status badge from your Google Sheet — no code changes needed:
 1. Go to the **Settings** tab in your Google Sheet
-2. Change cell **B1** to one of: `before`, `live`, or `after`
+2. Change the `status` value to one of: `before`, `live`, or `after`
 3. The leaderboard picks up the change on the next auto-refresh (every 2 minutes)
 
-| Value | Badge | Color |
-|---|---|---|
-| `before` | 📋 WEIGH-INS COMING SOON | Blue (static) |
-| `live` | 🔴 LIVE | Red (pulsing) |
-| `after` | 🏁 FINAL RESULTS | Green (static) |
+| Value | Badge | Color | Disclaimer |
+|---|---|---|---|
+| `before` | 📋 WEIGH-INS COMING SOON | Blue (static) | Hidden |
+| `live` | 🔴 LIVE | Red (pulsing) | Shown |
+| `after` | 🏁 FINAL RESULTS | Green (static) | Hidden |
 
 If the Settings URL is not configured, the badge defaults to "🔴 LIVE".
+
+### Tournament Name & Date (from Google Sheet)
+You can override the tournament name and date from the Settings tab without editing code:
+1. Add a row with key `tournamentName` and the desired name in column B
+2. Add a row with key `tournamentDate` and the desired date in column B
+3. These override the CONFIG defaults in `script.js` when present
+4. If the keys are missing from the sheet, the CONFIG values are used as fallbacks
 
 ### Display Limit
 Change `maxDisplay` in the CONFIG section to control how many entries are shown per category/division:
@@ -225,7 +239,7 @@ The parser supports flexible weight formats, including decimals:
 - `8 oz` (pounds default to 0)
 
 ### Disclaimer Banner
-The disclaimer text "⚠️ These are unofficial results." is in `index.html`. Edit or remove the `<div class="disclaimer-banner">` element as needed.
+The disclaimer text "⚠️ UNOFFICIAL RESULTS" only appears when status is `live`. It is hidden for `before` and `after` states. Edit the text in the `<div class="disclaimer-banner">` element in `index.html` as needed.
 
 ### Styling
 Edit `styles.css` to change colors, fonts, and layout. The design uses a light color scheme optimized for outdoor/sunlight viewing on mobile devices.
@@ -238,8 +252,8 @@ When you update `styles.css` or `script.js` and push to GitHub Pages, browsers m
 
 1. In `index.html`, increment the `?v=` query parameter on the CSS and JS references:
    ```html
-   <link rel="stylesheet" href="styles.css?v=11">
-   <script src="script.js?v=7"></script>
+   <link rel="stylesheet" href="styles.css?v=12">
+   <script src="script.js?v=13"></script>
    ```
 2. Push the updated `index.html` along with your changed CSS/JS files.
 

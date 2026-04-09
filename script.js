@@ -185,7 +185,9 @@ async function loadLeaderboard(csvUrl, tableId, prizeCount) {
         // This prevents wiping out good data if Google Sheets returns an empty response
         if (entries.length === 0) {
             // Only show empty message on initial load, not on refresh
-            const hasExistingData = tbody.querySelectorAll('tr:not(.loading-message):not(.empty-message):not(.error-message)').length > 0;
+            const existingRows = tbody.querySelectorAll('tr');
+            const hasExistingData = existingRows.length > 0 &&
+                !existingRows[0].querySelector('.loading-message, .empty-message, .error-message');
             if (!hasExistingData) {
                 tbody.innerHTML = '<tr><td colspan="3" class="empty-message">🎣 No weigh-ins recorded yet — stay tuned!</td></tr>';
             }
@@ -402,8 +404,10 @@ function updateTimestamp() {
 }
 
 /**
- * Fetch the Settings tab from Google Sheets and update the badge
- * Settings tab format: Row 1 = headers (status), Row 2 = value (before/live/after)
+ * Fetch all settings from the Settings tab in Google Sheets
+ * Settings tab format: Column A = key, Column B = value (one key-value pair per row)
+ * Supported keys: status (before/live/after), tournamentName, tournamentDate
+ * @returns {Object} Settings object with lowercase keys
  */
 async function fetchSettings() {
     const settingsUrl = CONFIG.sheets.settings;
