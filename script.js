@@ -475,6 +475,9 @@ function updateBadge(status) {
             badge.textContent = '🔴 LIVE';
             break;
     }
+
+    // Reveal badge now that correct status is set (hidden on load to prevent flash)
+    badge.style.visibility = 'visible';
 }
 
 /**
