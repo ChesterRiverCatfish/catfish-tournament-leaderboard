@@ -38,7 +38,7 @@ const CONFIG = {
     maxDisplay: 10,
 
     // Footer text
-    footerText: "Catfish Tournament Leaderboard"
+    footerText: "Chester River Catfish Tournament Leaderboard"
 };
 
 // =============================================
@@ -467,13 +467,19 @@ function updateBadge(status) {
             badge.classList.add('before');
             break;
         case 'after':
-            badge.textContent = '🏁 FINAL RESULTS';
+            badge.textContent = '🏁 FINAL RESULTS (pending polygraphs)';
             badge.classList.add('final');
             break;
         case 'live':
         default:
             badge.textContent = '🔴 LIVE';
             break;
+    }
+
+    // Show/hide the unofficial results disclaimer (only visible when live)
+    const disclaimer = document.querySelector('.disclaimer-banner');
+    if (disclaimer) {
+        disclaimer.style.display = (status === 'live') ? '' : 'none';
     }
 
     // Reveal badge now that correct status is set (hidden on load to prevent flash)
