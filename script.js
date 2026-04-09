@@ -408,8 +408,8 @@ function updateTimestamp() {
 async function fetchSettings() {
     const settingsUrl = CONFIG.sheets.settings;
     if (!settingsUrl) {
-        // No settings URL configured — default to 'live'
-        return 'live';
+        // No settings URL configured — return defaults
+        return { status: 'live' };
     }
 
     try {
@@ -419,36 +419,40 @@ async function fetchSettings() {
         const response = await fetch(fetchUrl, { cache: 'no-store' });
         const text = await response.text();
 
-        // Parse settings CSV — supports two layouts:
-        // Layout 1 (key,value on same row): "status,before"
-        // Layout 2 (header + data rows): "status\nbefore"
+        // Parse settings CSV — each row is a key,value pair
+        // Google Sheet Settings tab layout:
+        //   Column A (Key)      | Column B (Value)
+        //   status              | live
+        //   tournamentName      | 2026 Chester River Catfish Tournament
+        //   tournamentDate      | Saturday, August 29th, 2026
         const lines = text.trim().split('\n');
-        
-        if (lines.length >= 1) {
-            // Check if first line has a comma (Layout 1: key,value)
-            const firstLineParts = lines[0].split(',').map(p => p.trim().toLowerCase().replace(/['"]/g, ''));
-            
-            // Layout 1: "status,before" — value is in column B
-            if (firstLineParts.length >= 2) {
-                const value = firstLineParts[1];
-                if (['before', 'live', 'after'].includes(value)) {
-                    return value;
-                }
-            }
-            
-            // Layout 2: header row + data row — value is on line 2
-            if (lines.length >= 2) {
-                const value = lines[1].trim().toLowerCase().replace(/['"]/g, '');
-                if (['before', 'live', 'after'].includes(value)) {
-                    return value;
+        const settings = {};
+
+        for (const line of lines) {
+            const fields = parseCSVLine(line);
+            if (fields.length >= 2) {
+                const key = fields[0].trim().toLowerCase();
+                const value = fields[1].trim();
+                if (key && value) {
+                    settings[key] = value;
                 }
             }
         }
+
+        // Normalize status value
+        if (settings.status) {
+            settings.status = settings.status.toLowerCase();
+            if (!['before', 'live', 'after'].includes(settings.status)) {
+                settings.status = 'live'; // fallback to live if invalid
+            }
+        }
+
+        return settings;
     } catch (err) {
         console.warn('Could not fetch settings:', err);
     }
 
-    return tournamentStatus; // Keep current status on error
+    return { status: tournamentStatus }; // Keep current status on error
 }
 
 /**
@@ -490,9 +494,23 @@ function updateBadge(status) {
  * Fetch settings, update badge, then load leaderboard data
  */
 async function fetchSettingsAndRefresh() {
-    const newStatus = await fetchSettings();
-    tournamentStatus = newStatus;
+    const settings = await fetchSettings();
+
+    // Update tournament status badge
+    tournamentStatus = settings.status || 'live';
     updateBadge(tournamentStatus);
+
+    // Apply dynamic settings from the Settings tab (overrides CONFIG defaults)
+    if (settings.tournamentname) {
+        const nameEl = document.getElementById('tournament-name');
+        if (nameEl) nameEl.textContent = settings.tournamentname;
+        document.title = settings.tournamentname + ' — Live Leaderboard';
+    }
+    if (settings.tournamentdate) {
+        const dateEl = document.getElementById('tournament-date');
+        if (dateEl) dateEl.textContent = settings.tournamentdate;
+    }
+
     await loadAllData();
 }
 
