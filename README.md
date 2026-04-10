@@ -17,6 +17,7 @@ A live, auto-refreshing leaderboard for catfish tournaments. Officials enter dat
 - **Social media sharing** with Open Graph meta tags for rich Facebook previews
 - **Unofficial results disclaimer** banner displayed below the header
 - **Google Analytics (GA4)** tracking for visitor/traffic insights
+- **Admin announcement banner** — display a custom message from the Google Sheet Settings tab
 - **Customizable** tournament name, date, banner image, sponsors, and display limits
 - **No backend required** — Google Sheets is the database
 
@@ -41,11 +42,13 @@ A live, auto-refreshing leaderboard for catfish tournaments. Officials enter dat
    | **status** | **before** |
    | **tournamentName** | **2026 Chester River Catfish Tournament** |
    | **tournamentDate** | **Saturday, August 29th, 2026** |
+   | **announcement** | *(leave blank or add a message)* |
 
    **Settings keys:**
    - `status` → Controls the badge: `before`, `live`, or `after`
    - `tournamentName` → Overrides the tournament name displayed in the header and page title
    - `tournamentDate` → Overrides the tournament date displayed in the header
+   - `announcement` → Displays a blue info banner below the header (leave blank to hide)
 
    **Status values:**
    - `before` → 📋 WEIGH-INS COMING SOON (blue badge)
@@ -242,6 +245,14 @@ The parser supports flexible weight formats, including decimals:
 ### Disclaimer Banner
 The disclaimer text "⚠️ UNOFFICIAL RESULTS" only appears when status is `live`. It is hidden for `before` and `after` states. Edit the text in the `<div class="disclaimer-banner">` element in `index.html` as needed.
 
+### Admin Announcement
+Display a custom message to all participants from the Settings tab:
+1. Add a row with key `announcement` in Column A
+2. Type the message in Column B (e.g., "Weigh-ins delayed 30 minutes due to weather")
+3. The message appears in a blue info banner below the header with a 📢 prefix
+4. To hide the announcement, clear Column B (leave it empty)
+5. Updates automatically on the next refresh cycle (every 2 minutes)
+
 ### Styling
 Edit `styles.css` to change colors, fonts, and layout. The design uses a light color scheme optimized for outdoor/sunlight viewing on mobile devices.
 
@@ -253,8 +264,8 @@ When you update `styles.css` or `script.js` and push to GitHub Pages, browsers m
 
 1. In `index.html`, increment the `?v=` query parameter on the CSS and JS references:
    ```html
-   <link rel="stylesheet" href="styles.css?v=17">
-   <script src="script.js?v=13"></script>
+   <link rel="stylesheet" href="styles.css?v=18">
+   <script src="script.js?v=14"></script>
    ```
 2. Push the updated `index.html` along with your changed CSS/JS files.
 

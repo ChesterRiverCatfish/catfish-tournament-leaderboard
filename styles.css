@@ -127,6 +127,17 @@ body {
     padding: 0.3rem 0.5rem;
 }
 
+/* ---------- Admin Announcement ---------- */
+.admin-announcement {
+    text-align: center;
+    background: #ebf8ff;
+    border-bottom: 2px solid #3182ce;
+    color: #2b6cb0;
+    font-size: 0.85rem;
+    font-weight: 700;
+    padding: 0.5rem 1rem;
+}
+
 /* ---------- Main Container ---------- */
 .leaderboard-container {
     max-width: 1200px;

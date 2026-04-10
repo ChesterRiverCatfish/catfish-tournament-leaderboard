@@ -515,6 +515,18 @@ async function fetchSettingsAndRefresh() {
         if (dateEl) dateEl.textContent = settings.tournamentdate;
     }
 
+    // Show/hide admin announcement
+    const announcementEl = document.getElementById('admin-announcement');
+    if (announcementEl) {
+        const msg = settings.announcement || '';
+        if (msg.trim()) {
+            announcementEl.textContent = '📢 ' + msg.trim();
+            announcementEl.style.display = '';
+        } else {
+            announcementEl.style.display = 'none';
+        }
+    }
+
     await loadAllData();
 }
 
