@@ -12,6 +12,7 @@ A live, auto-refreshing leaderboard for catfish tournaments. Officials enter dat
 - **Top 10 display** — Only the top 10 entries per category/division are shown (configurable)
 - **Auto-refresh** every 2 minutes
 - **Mobile-first** responsive design with light theme optimized for outdoor/sunlight viewing
+- **Favicon** using the tournament logo for browser tab identification
 - **Live / Before / After status toggle** — controlled from Google Sheets, no code changes needed
 - **Social media sharing** with Open Graph meta tags for rich Facebook previews
 - **Unofficial results disclaimer** banner displayed below the header
@@ -252,7 +253,7 @@ When you update `styles.css` or `script.js` and push to GitHub Pages, browsers m
 
 1. In `index.html`, increment the `?v=` query parameter on the CSS and JS references:
    ```html
-   <link rel="stylesheet" href="styles.css?v=12">
+   <link rel="stylesheet" href="styles.css?v=17">
    <script src="script.js?v=13"></script>
    ```
 2. Push the updated `index.html` along with your changed CSS/JS files.

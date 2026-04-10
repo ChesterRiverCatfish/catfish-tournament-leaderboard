@@ -259,9 +259,8 @@ body {
 }
 
 .leaderboard-table tbody .col-name {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    overflow-wrap: break-word;
+    word-break: break-word;
 }
 
 .col-weight {
