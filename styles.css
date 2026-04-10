@@ -111,8 +111,8 @@ body {
 }
 
 .last-updated {
-    font-size: 0.6rem;
-    color: #4a5568;
+    font-size: 0.65rem;
+    color: #3d4a5c;
     font-weight: 700;
 }
 
@@ -181,6 +181,19 @@ body {
     margin-bottom: 0.4rem;
 }
 
+.prize-inline {
+    font-size: 0.65rem;
+    color: #b7791f;
+    font-weight: 800;
+    margin-left: 0.4rem;
+    letter-spacing: normal;
+    text-transform: none;
+}
+
+.division-title .prize-inline {
+    font-size: 0.6rem;
+}
+
 /* ---------- Tables ---------- */
 .table-wrapper {
     overflow-x: auto;
@@ -190,6 +203,7 @@ body {
 
 .leaderboard-table {
     width: 100%;
+    table-layout: fixed;
     border-collapse: collapse;
     background: #ffffff;
     border-radius: 8px;
@@ -244,6 +258,12 @@ body {
     width: auto;
 }
 
+.leaderboard-table tbody .col-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
 .col-weight {
     width: 105px;
     text-align: right;
@@ -264,23 +284,23 @@ body {
 
 /* ---------- Prize Rows ---------- */
 .prize-row-1 {
-    background: #fefce8 !important;
-    border-left: 4px solid #d69e2e;
+    background: #fef9e7 !important;
+    border-left: 6px solid #d69e2e;
 }
 
 .prize-row-2 {
-    background: #f7f7f7 !important;
-    border-left: 4px solid #a0aec0;
+    background: #eef0f2 !important;
+    border-left: 6px solid #a0aec0;
 }
 
 .prize-row-3 {
-    background: #fef5ee !important;
-    border-left: 4px solid #c77c32;
+    background: #fef0e0 !important;
+    border-left: 6px solid #c77c32;
 }
 
 .prize-row-4 {
-    background: #ebf8ff !important;
-    border-left: 4px solid #3182ce;
+    background: #e8f4fd !important;
+    border-left: 6px solid #3182ce;
 }
 
 .rank-icon {
@@ -296,6 +316,8 @@ body {
     padding: 1.5rem;
     color: #718096;
     font-style: italic;
+    white-space: normal;
+    overflow: visible;
 }
 
 .error-message {
@@ -430,6 +452,14 @@ body {
         font-size: 1.2rem;
     }
 
+    .prize-inline {
+        font-size: 0.75rem;
+    }
+
+    .division-title .prize-inline {
+        font-size: 0.7rem;
+    }
+
     .leaderboard-table thead th {
         font-size: 0.8rem;
         padding: 0.75rem 1rem;
@@ -463,21 +493,28 @@ body {
     .leaderboard-container {
         display: flex;
         gap: 2rem;
-        align-items: stretch;
+        align-items: flex-start;
         padding: 1.5rem 2rem;
     }
 
-    /* Equal width for both divisions */
+    /* Adult takes more space (3 tables vs 1) */
     .adult-division {
-        flex: 1;
+        flex: 3;
         min-width: 0;
     }
 
     .junior-division {
-        flex: 1;
+        flex: 2;
         min-width: 0;
         border-left: 3px solid #cbd5e0;
         padding-left: 2rem;
+        position: sticky;
+        top: 1rem;
+    }
+
+    /* Allow name truncation to relax on desktop */
+    .leaderboard-table tbody .col-name {
+        white-space: normal;
     }
 
     .sponsors-grid {
