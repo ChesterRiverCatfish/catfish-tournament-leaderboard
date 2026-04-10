@@ -130,12 +130,12 @@ body {
 /* ---------- Admin Announcement ---------- */
 .admin-announcement {
     text-align: center;
-    background: #e53e3e;
-    color: #ffffff;
+    background: #fef9c3;
+    border-bottom: 2px solid #d69e2e;
+    color: #713f12;
     font-size: 0.85rem;
-    font-weight: 800;
-    padding: 0.6rem 1rem;
-    letter-spacing: 0.5px;
+    font-weight: 700;
+    padding: 0.5rem 1rem;
 }
 
 /* ---------- Main Container ---------- */
