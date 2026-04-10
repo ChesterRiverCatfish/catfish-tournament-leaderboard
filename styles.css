@@ -515,6 +515,8 @@ body {
     /* Allow name truncation to relax on desktop */
     .leaderboard-table tbody .col-name {
         white-space: normal;
+        overflow-wrap: break-word;
+        word-break: break-word;
     }
 
     .sponsors-grid {
