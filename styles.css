@@ -265,7 +265,7 @@ body {
 }
 
 .col-weight {
-    width: 105px;
+    width: 115px;
     text-align: right;
     white-space: nowrap;
 }
@@ -277,6 +277,7 @@ body {
 
 .leaderboard-table tbody .col-weight {
     text-align: right;
+    padding-right: 0.75rem;
     font-weight: 800;
     color: #1a5276;
     font-variant-numeric: tabular-nums;
