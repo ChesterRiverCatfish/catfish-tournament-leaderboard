@@ -437,7 +437,7 @@ async function fetchSettings() {
             if (fields.length >= 2) {
                 const key = fields[0].trim().toLowerCase();
                 const value = fields[1].trim();
-                if (key && value) {
+                if (key) {
                     settings[key] = value;
                 }
             }
