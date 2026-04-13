@@ -48,6 +48,11 @@ const CONFIG = {
 let tournamentStatus = 'live'; // default: 'before', 'live', or 'after'
 let refreshTimerId = null;
 
+// Toggle state for Junior Division "Show All" view
+let juniorShowAll = false;
+// Stores full entries per tableId so the toggle can re-render without re-fetching
+let tableData = {};
+
 document.addEventListener('DOMContentLoaded', () => {
     applyConfig();
     fetchSettingsAndRefresh();
@@ -129,14 +134,15 @@ function renderSponsors() {
  * Load all leaderboard data from Google Sheets
  */
 async function loadAllData() {
+    const defaultMax = CONFIG.maxDisplay || 10;
     const tasks = [
-        { url: CONFIG.sheets.channelCatfish, tableId: 'channel-catfish-table', prizeCount: 3 },
-        { url: CONFIG.sheets.blueFlathead,   tableId: 'blue-flathead-table',   prizeCount: 3 },
-        { url: CONFIG.sheets.stringer,       tableId: 'stringer-table',        prizeCount: 3 },
-        { url: CONFIG.sheets.junior,         tableId: 'junior-table',          prizeCount: 4 }
+        { url: CONFIG.sheets.channelCatfish, tableId: 'channel-catfish-table', prizeCount: 3, maxDisplay: defaultMax },
+        { url: CONFIG.sheets.blueFlathead,   tableId: 'blue-flathead-table',   prizeCount: 3, maxDisplay: defaultMax },
+        { url: CONFIG.sheets.stringer,       tableId: 'stringer-table',        prizeCount: 3, maxDisplay: defaultMax },
+        { url: CONFIG.sheets.junior,         tableId: 'junior-table',          prizeCount: 4, maxDisplay: juniorShowAll ? 0 : defaultMax }
     ];
 
-    const promises = tasks.map(task => loadLeaderboard(task.url, task.tableId, task.prizeCount));
+    const promises = tasks.map(task => loadLeaderboard(task.url, task.tableId, task.prizeCount, task.maxDisplay));
 
     try {
         await Promise.allSettled(promises);
@@ -154,7 +160,7 @@ async function loadAllData() {
  * @param {string} tableId - The table element ID to render into
  * @param {number} prizeCount - Number of prize-winning positions to highlight
  */
-async function loadLeaderboard(csvUrl, tableId, prizeCount) {
+async function loadLeaderboard(csvUrl, tableId, prizeCount, maxDisplay) {
     const table = document.getElementById(tableId);
     if (!table) return;
 
@@ -199,7 +205,7 @@ async function loadLeaderboard(csvUrl, tableId, prizeCount) {
         entries.sort((a, b) => b.totalOunces - a.totalOunces);
 
         // Render
-        renderTable(tbody, entries, prizeCount);
+        renderTable(tbody, entries, prizeCount, maxDisplay, tableId);
 
     } catch (err) {
         console.error(`Error loading ${tableId}:`, err);
@@ -337,14 +343,20 @@ function parseWeight(weightStr) {
  * @param {HTMLElement} tbody - The tbody element
  * @param {Array} entries - Sorted array of entry objects
  * @param {number} prizeCount - Number of prize positions to highlight
+ * @param {number} maxDisplay - Max entries to show (0 = show all)
+ * @param {string} tableId - Table element ID (used for toggle state)
  */
-function renderTable(tbody, entries, prizeCount) {
+function renderTable(tbody, entries, prizeCount, maxDisplay, tableId) {
+    // Store entries for toggle re-rendering (avoids re-fetching)
+    if (tableId) {
+        tableData[tableId] = { entries, prizeCount };
+    }
+
     tbody.innerHTML = '';
 
     const prizeIcons = ['🥇', '🥈', '🥉', '🏅'];
 
     // Limit to top N entries if configured
-    const maxDisplay = CONFIG.maxDisplay || 0;
     const displayEntries = (maxDisplay > 0) ? entries.slice(0, maxDisplay) : entries;
 
     displayEntries.forEach((entry, index) => {
@@ -380,6 +392,32 @@ function renderTable(tbody, entries, prizeCount) {
         tr.appendChild(weightTd);
         tbody.appendChild(tr);
     });
+
+    // Add "Show All / Show Top 10" toggle for Junior Division
+    const defaultMax = CONFIG.maxDisplay || 10;
+    if (tableId === 'junior-table' && entries.length > defaultMax) {
+        const toggleRow = document.createElement('tr');
+        const toggleTd = document.createElement('td');
+        toggleTd.colSpan = 3;
+        toggleTd.className = 'toggle-cell';
+
+        const btn = document.createElement('button');
+        btn.className = 'toggle-btn';
+        if (maxDisplay > 0) {
+            btn.textContent = '\u25BC Show All (' + entries.length + ')';
+        } else {
+            btn.textContent = '\u25B2 Show Top ' + defaultMax;
+        }
+        btn.addEventListener('click', function() {
+            juniorShowAll = !juniorShowAll;
+            const newMax = juniorShowAll ? 0 : defaultMax;
+            renderTable(tbody, entries, prizeCount, newMax, tableId);
+        });
+
+        toggleTd.appendChild(btn);
+        toggleRow.appendChild(toggleTd);
+        tbody.appendChild(toggleRow);
+    }
 }
 
 // =============================================

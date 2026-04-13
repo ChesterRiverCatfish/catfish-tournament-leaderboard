@@ -336,6 +336,34 @@ body {
     font-weight: 600;
 }
 
+/* ---------- Junior "Show All" Toggle ---------- */
+.toggle-cell {
+    text-align: center;
+    padding: 0.5rem !important;
+    border-top: 1px solid #e2e8f0;
+}
+
+.toggle-btn {
+    background: #edf2f7;
+    color: #2d3748;
+    border: 1px solid #cbd5e0;
+    border-radius: 6px;
+    padding: 0.35rem 1rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+}
+
+.toggle-btn:hover {
+    background: #e2e8f0;
+    border-color: #a0aec0;
+}
+
+.toggle-btn:active {
+    background: #cbd5e0;
+}
+
 /* ---------- Sponsors Section ---------- */
 .sponsors-section {
     max-width: 1200px;
