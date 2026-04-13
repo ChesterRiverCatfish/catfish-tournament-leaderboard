@@ -8,8 +8,8 @@ A live, auto-refreshing leaderboard for catfish tournaments. Officials enter dat
   - Channel Catfish (top 3 win prizes 🥇🥈🥉)
   - Blue/Flathead Catfish (top 3 win prizes 🥇🥈🥉)
   - 3 Fish Stringer (top 3 win prizes 🥇🥈🥉)
-- **Junior Division** — 1 combined leaderboard (top 4 win prizes 🥇🥈🥉🏅)
-- **Top 10 display** — Only the top 10 entries per category/division are shown (configurable)
+- **Junior Division** — 1 combined leaderboard (top 4 win prizes 🥇🥈🥉🏅) with "Show All / Show Top 10" toggle
+- **Top 10 display** — Only the top 10 entries per category/division are shown (configurable); Junior Division includes a toggle to expand all entries
 - **Auto-refresh** every 2 minutes
 - **Mobile-first** responsive design with light theme optimized for outdoor/sunlight viewing
 - **Favicon** using the tournament logo for browser tab identification
@@ -192,7 +192,7 @@ Copy the GitHub Pages URL and share it on Facebook, Twitter, or any social media
 3. **Officials** open the Google Sheet on a phone, tablet, or laptop
 4. Enter each weigh-in: type the angler's **Name** and **Weight** (e.g., `14 lbs 6 oz`)
 5. The leaderboard website **auto-refreshes every 2 minutes** to show the latest standings
-6. Only the **top 10** entries per category are displayed (configurable via `maxDisplay`)
+6. Only the **top 10** entries per category are displayed (configurable via `maxDisplay`). The **Junior Division** includes a "Show All / Show Top 10" toggle button when more than 10 entries exist
 7. Viewers on Facebook can tap the shared link anytime to see live results
 8. The **"⚠️ UNOFFICIAL RESULTS"** disclaimer banner is displayed only in `live` mode
 9. **Tournament ends** — Change the status to `after`. The badge shows "🏁 FINAL RESULTS", the disclaimer hides, and auto-refresh continues checking the setting
@@ -231,6 +231,8 @@ Change `maxDisplay` in the CONFIG section to control how many entries are shown 
 - `20` — Show top 20
 - `0` — Show all entries (no limit)
 
+**Junior Division Toggle:** When the Junior Division has more than `maxDisplay` entries, a "▼ Show All (N)" / "▲ Show Top 10" toggle button appears below the table. This lets viewers expand or collapse the full list without affecting the adult categories. The toggle state persists across auto-refreshes.
+
 ### Weight Format
 The parser supports flexible weight formats, including decimals:
 - `12 lbs 8 oz` (recommended)
@@ -264,8 +266,8 @@ When you update `styles.css` or `script.js` and push to GitHub Pages, browsers m
 
 1. In `index.html`, increment the `?v=` query parameter on the CSS and JS references:
    ```html
-   <link rel="stylesheet" href="styles.css?v=18">
-   <script src="script.js?v=14"></script>
+   <link rel="stylesheet" href="styles.css?v=21">
+   <script src="script.js?v=16"></script>
    ```
 2. Push the updated `index.html` along with your changed CSS/JS files.
 
