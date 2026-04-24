@@ -138,7 +138,7 @@ async function loadAllData() {
     const tasks = [
         { url: CONFIG.sheets.channelCatfish, tableId: 'channel-catfish-table', prizeCount: 3, maxDisplay: defaultMax },
         { url: CONFIG.sheets.blueFlathead,   tableId: 'blue-flathead-table',   prizeCount: 3, maxDisplay: defaultMax },
-        { url: CONFIG.sheets.stringer,       tableId: 'stringer-table',        prizeCount: 3, maxDisplay: defaultMax },
+        { url: CONFIG.sheets.stringer,       tableId: 'stringer-table',        prizeCount: 1, maxDisplay: defaultMax },
         { url: CONFIG.sheets.junior,         tableId: 'junior-table',          prizeCount: 4, maxDisplay: juniorShowAll ? 0 : defaultMax }
     ];
 

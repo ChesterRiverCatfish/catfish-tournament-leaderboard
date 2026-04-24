@@ -7,7 +7,7 @@ A live, auto-refreshing leaderboard for catfish tournaments. Officials enter dat
 - **Adult Division** — 3 separate leaderboards:
   - Channel Catfish (top 3 win prizes 🥇🥈🥉)
   - Blue/Flathead Catfish (top 3 win prizes 🥇🥈🥉)
-  - 3 Fish Stringer (top 3 win prizes 🥇🥈🥉)
+  - 3 Fish Stringer (winner takes all 🥇)
 - **Junior Division** — 1 combined leaderboard (top 4 win prizes 🥇🥈🥉🏅) with "Show All / Show Top 10" toggle
 - **Top 10 display** — Only the top 10 entries per category/division are shown (configurable); Junior Division includes a toggle to expand all entries
 - **Auto-refresh** every 2 minutes
