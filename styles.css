@@ -180,13 +180,13 @@ body {
     color: #92400e;
 }
 
-/* Weigh-In Sponsor — moderate prominence */
+/* Weigh-In Sponsor — inside adult division, bottom of column */
 .weighin-sponsor {
     padding: 0.75rem 1rem;
     background: #f7fafc;
     border-top: 2px solid #e2e8f0;
     border-bottom: 2px solid #e2e8f0;
-    margin: 0.5rem 0;
+    margin: 1rem 0 0 0;
 }
 
 .weighin-sponsor .tier-label {
