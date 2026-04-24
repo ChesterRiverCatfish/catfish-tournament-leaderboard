@@ -18,7 +18,8 @@ A live, auto-refreshing leaderboard for catfish tournaments. Officials enter dat
 - **Unofficial results disclaimer** banner displayed below the header
 - **Google Analytics (GA4)** tracking for visitor/traffic insights
 - **Admin announcement banner** — display a custom message from the Google Sheet Settings tab
-- **Customizable** tournament name, date, banner image, sponsors, and display limits
+- **Customizable** tournament name, date, banner image, and display limits
+- **Tiered sponsor system** — Presenting, Weigh-In, Junior Division, and General sponsors managed from a dedicated Google Sheet Sponsors tab
 - **No backend required** — Google Sheets is the database
 
 ---
@@ -28,12 +29,31 @@ A live, auto-refreshing leaderboard for catfish tournaments. Officials enter dat
 ### Step 1: Create the Google Sheet
 
 1. Go to [Google Sheets](https://sheets.google.com) and create a new spreadsheet
-2. Create **5 tabs** (rename the sheet tabs at the bottom):
+2. Create **6 tabs** (rename the sheet tabs at the bottom):
    - `Channel Catfish`
    - `Blue/Flathead Catfish`
    - `3 Fish Stringer`
    - `Junior`
    - `Settings`
+   - `Sponsors`
+
+3. In the **Sponsors** tab, set up 4 columns with a header row:
+
+   | A (Tier) | B (Name) | C (Logo) | D (URL) |
+   |---|---|---|---|
+   | **Tier** | **Name** | **Logo** | **URL** |
+   | presenting | ABC Tackle Co. | images/sponsors/abc.png | https://abctackle.com |
+   | weighin | Fishermans Wharf | images/sponsors/wharf.png | |
+   | junior | Kids Cast Foundation | images/sponsors/kidscast.png | https://kidscast.org |
+   | general | Chestertown Animal Hospital | images/sponsors/cah.png | |
+   | general | Heller the Seller | images/sponsors/heller.png | |
+   | general | Revere Seed | images/sponsors/revere.png | |
+
+   - **Tier values:** `presenting`, `weighin`, `junior`, `general`
+   - Only 1 presenting, 1 weighin, 1 junior sponsor (first match wins)
+   - Unlimited general sponsors — just add rows
+   - Logo (Column C) and URL (Column D) are optional
+   - To remove a sponsor, delete the row or clear the Name column
 
 3. In the **Settings** tab, add key-value settings (Column A = key, Column B = value):
 
@@ -110,12 +130,6 @@ const CONFIG = {
 
     // Maximum entries to display per category/division (0 = show all)
     maxDisplay: 10,
-
-    // Sponsors (optional)
-    sponsors: [
-        { name: "Bait Shop Pro", logo: "images/sponsors/baitshop.png", url: "https://baitshoppro.com" },
-        { name: "Lake Marina", logo: "images/sponsors/marina.png" }
-    ],
 
     // Footer text
     footerText: "Your Tournament Name — Leaderboard"
@@ -255,6 +269,25 @@ Display a custom message to all participants from the Settings tab:
 4. To hide the announcement, clear Column B (leave it empty)
 5. Updates automatically on the next refresh cycle (every 2 minutes)
 
+### Sponsors
+All sponsors are managed from the **Sponsors** tab in the Google Sheet — no code changes needed:
+
+| Tier | Placement on Page | Logo Size | Visual Treatment |
+|---|---|---|---|
+| `presenting` | Below banners, above all leaderboards | Large (200px) | Gold gradient background, "⭐ Presented by" label |
+| `weighin` | Between adult and junior divisions | Medium (140px) | Gray background, "⚖️ Weigh-In Sponsor" label |
+| `junior` | Inside junior section, above table | Medium (140px) | Green tint, "🐟 Junior Division Sponsor" label |
+| `general` | Bottom of page in grid | Small (100px) | Existing "Our Sponsors" grid |
+
+**To add/change sponsors:**
+1. Open the **Sponsors** tab in Google Sheets
+2. Add or edit a row: `Tier | Name | Logo path | URL`
+3. Changes appear on the website within 2 minutes (next auto-refresh)
+
+**To remove a sponsor:** Delete the row or clear the Name column.
+
+**Note:** The `CONFIG.sheets.sponsors` URL in `script.js` must be set to the published CSV URL of the Sponsors tab. If the URL is empty, no sponsors will be displayed.
+
 ### Styling
 Edit `styles.css` to change colors, fonts, and layout. The design uses a light color scheme optimized for outdoor/sunlight viewing on mobile devices.
 
@@ -266,8 +299,8 @@ When you update `styles.css` or `script.js` and push to GitHub Pages, browsers m
 
 1. In `index.html`, increment the `?v=` query parameter on the CSS and JS references:
    ```html
-   <link rel="stylesheet" href="styles.css?v=21">
-   <script src="script.js?v=16"></script>
+   <link rel="stylesheet" href="styles.css?v=22">
+   <script src="script.js?v=18"></script>
    ```
 2. Push the updated `index.html` along with your changed CSS/JS files.
 

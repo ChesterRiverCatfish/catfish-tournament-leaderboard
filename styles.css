@@ -138,6 +138,135 @@ body {
     padding: 0.5rem 1rem;
 }
 
+/* ---------- Tier Sponsors ---------- */
+.presenting-sponsor,
+.weighin-sponsor,
+.junior-sponsor {
+    text-align: center;
+}
+
+/* Presenting Sponsor — most prominent */
+.presenting-sponsor {
+    padding: 1rem 1rem 0.75rem;
+    background: linear-gradient(180deg, #fffbeb, #fef3c7);
+    border-bottom: 3px solid #d69e2e;
+}
+
+.presenting-sponsor .tier-label {
+    font-size: 0.65rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    color: #92400e;
+    margin-bottom: 0.5rem;
+}
+
+.presenting-sponsor .sponsor-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.presenting-sponsor .sponsor-logo {
+    max-width: 200px;
+    max-height: 80px;
+    object-fit: contain;
+}
+
+.presenting-sponsor .sponsor-name {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #92400e;
+}
+
+/* Weigh-In Sponsor — moderate prominence */
+.weighin-sponsor {
+    padding: 0.75rem 1rem;
+    background: #f7fafc;
+    border-top: 2px solid #e2e8f0;
+    border-bottom: 2px solid #e2e8f0;
+    margin: 0.5rem 0;
+}
+
+.weighin-sponsor .tier-label {
+    font-size: 0.6rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: #4a5568;
+    margin-bottom: 0.4rem;
+}
+
+.weighin-sponsor .sponsor-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.weighin-sponsor .sponsor-logo {
+    max-width: 140px;
+    max-height: 55px;
+    object-fit: contain;
+}
+
+.weighin-sponsor .sponsor-name {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #2d3748;
+}
+
+/* Junior Division Sponsor */
+.junior-sponsor {
+    padding: 0.6rem 1rem;
+    background: #f0fff4;
+    border: 1px solid #c6f6d5;
+    border-radius: 8px;
+    margin: 0.5rem 0;
+}
+
+.junior-sponsor .tier-label {
+    font-size: 0.6rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: #276749;
+    margin-bottom: 0.4rem;
+}
+
+.junior-sponsor .sponsor-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.junior-sponsor .sponsor-logo {
+    max-width: 140px;
+    max-height: 55px;
+    object-fit: contain;
+}
+
+.junior-sponsor .sponsor-name {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #276749;
+}
+
+/* Tier sponsor link styling */
+.tier-sponsor-link {
+    text-decoration: none;
+    color: inherit;
+    transition: opacity 0.2s ease;
+}
+
+@media (hover: hover) {
+    .tier-sponsor-link:hover {
+        opacity: 0.8;
+    }
+}
+
 /* ---------- Main Container ---------- */
 .leaderboard-container {
     max-width: 1200px;

@@ -19,20 +19,12 @@ const CONFIG = {
         blueFlathead:     "https://docs.google.com/spreadsheets/d/e/2PACX-1vSesRUtCsBmtAUfXuJIQ9A_MJCESJC2Tbe2WWOJpx-tpvjwqTk2lUBsl_vN-SzSwimkiv5NwTk4Ioo9/pub?gid=1954833042&single=true&output=csv",
         stringer:         "https://docs.google.com/spreadsheets/d/e/2PACX-1vSesRUtCsBmtAUfXuJIQ9A_MJCESJC2Tbe2WWOJpx-tpvjwqTk2lUBsl_vN-SzSwimkiv5NwTk4Ioo9/pub?gid=1361461277&single=true&output=csv",
         junior:           "https://docs.google.com/spreadsheets/d/e/2PACX-1vSesRUtCsBmtAUfXuJIQ9A_MJCESJC2Tbe2WWOJpx-tpvjwqTk2lUBsl_vN-SzSwimkiv5NwTk4Ioo9/pub?gid=1116047246&single=true&output=csv",
-        settings:         "https://docs.google.com/spreadsheets/d/e/2PACX-1vSesRUtCsBmtAUfXuJIQ9A_MJCESJC2Tbe2WWOJpx-tpvjwqTk2lUBsl_vN-SzSwimkiv5NwTk4Ioo9/pub?gid=822712516&single=true&output=csv"
+        settings:         "https://docs.google.com/spreadsheets/d/e/2PACX-1vSesRUtCsBmtAUfXuJIQ9A_MJCESJC2Tbe2WWOJpx-tpvjwqTk2lUBsl_vN-SzSwimkiv5NwTk4Ioo9/pub?gid=822712516&single=true&output=csv",
+        sponsors:         "https://docs.google.com/spreadsheets/d/e/2PACX-1vSesRUtCsBmtAUfXuJIQ9A_MJCESJC2Tbe2WWOJpx-tpvjwqTk2lUBsl_vN-SzSwimkiv5NwTk4Ioo9/pub?gid=1844937710&single=true&output=csv"
     },
 
     // Refresh interval in minutes
     refreshInterval: 2,
-
-    // Sponsors — Add your sponsors here
-    // Each sponsor: { name: "Sponsor Name", logo: "images/sponsor-logo.png", url: "https://example.com" }
-    // The url and logo fields are optional
-    sponsors: [
-         { name: "Chestertown Animal Hospital", logo: "images/sponsors/Chestertown Animal Hospital Logo.png" },
-         { name: "Heller the Seller", logo: "images/sponsors/Heller the Seller.png" },
-         { name: "Revere Seed", logo: "images/sponsors/REVERE_color_logo.png" },
-    ],
 
     // Maximum entries to display per category/division (0 = show all)
     maxDisplay: 10,
@@ -84,20 +76,109 @@ function applyConfig() {
     // Footer
     const footerEl = document.getElementById('footer-text');
     if (footerEl) footerEl.textContent = CONFIG.footerText;
+}
 
-    // Sponsors
-    renderSponsors();
+// =============================================
+// SPONSOR MANAGEMENT
+// =============================================
+
+/**
+ * Fetch and parse sponsors from the Sponsors Google Sheet tab.
+ * Sheet format: Row 1 = header; Columns: Tier | Name | Logo | URL
+ * Tier values: presenting, weighin, junior, general
+ * @returns {Object} { presenting: {}, weighin: {}, junior: {}, general: [] }
+ */
+async function fetchSponsors() {
+    const sponsorsUrl = CONFIG.sheets.sponsors;
+    const result = { presenting: null, weighin: null, junior: null, general: [] };
+
+    if (!sponsorsUrl || sponsorsUrl.includes('YOUR_') || sponsorsUrl.includes('_HERE') || sponsorsUrl === '') {
+        return result;
+    }
+
+    try {
+        const cacheBuster = '_cb=' + Date.now();
+        const separator = sponsorsUrl.includes('?') ? '&' : '?';
+        const fetchUrl = sponsorsUrl + separator + cacheBuster;
+        const response = await fetch(fetchUrl, { cache: 'no-store' });
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const text = await response.text();
+
+        const lines = text.trim().split('\n');
+        // Skip header row (row 1)
+        for (let i = 1; i < lines.length; i++) {
+            const fields = parseCSVLine(lines[i]);
+            if (fields.length < 2) continue;
+
+            const tier = fields[0].trim().toLowerCase();
+            const name = fields[1].trim();
+            if (!name) continue; // skip rows without a name
+
+            const logo = (fields.length > 2) ? fields[2].trim() : '';
+            const url  = (fields.length > 3) ? fields[3].trim() : '';
+
+            const sponsor = { name, logo, url };
+
+            if (tier === 'presenting' && !result.presenting) {
+                result.presenting = sponsor;
+            } else if (tier === 'weighin' && !result.weighin) {
+                result.weighin = sponsor;
+            } else if (tier === 'junior' && !result.junior) {
+                result.junior = sponsor;
+            } else if (tier === 'general') {
+                result.general.push(sponsor);
+            }
+        }
+    } catch (err) {
+        console.warn('Could not fetch sponsors:', err);
+    }
+
+    return result;
 }
 
 /**
- * Render sponsor logos and names into the sponsors grid
+ * Render a tier sponsor (presenting, weighin, or junior) into its container div.
+ * @param {string} elementId - The container element ID
+ * @param {Object|null} sponsor - Sponsor object { name, logo, url } or null to hide
+ * @param {string} label - The tier label text (e.g., "⭐ Presented by")
  */
-function renderSponsors() {
+function renderTierSponsor(elementId, sponsor, label) {
+    const el = document.getElementById(elementId);
+    if (!el) return;
+
+    if (!sponsor || !sponsor.name) {
+        el.style.display = 'none';
+        el.innerHTML = '';
+        return;
+    }
+
+    let contentHtml = '';
+    if (sponsor.logo) {
+        contentHtml += `<img class="sponsor-logo" src="${sponsor.logo}" alt="${sponsor.name}" onerror="this.style.display='none'">`;
+    }
+    contentHtml += `<span class="sponsor-name">${sponsor.name}</span>`;
+
+    let innerHtml = `<div class="tier-label">${label}</div>`;
+    if (sponsor.url) {
+        innerHtml += `<a class="sponsor-content tier-sponsor-link" href="${sponsor.url}" target="_blank" rel="noopener noreferrer">${contentHtml}</a>`;
+    } else {
+        innerHtml += `<div class="sponsor-content">${contentHtml}</div>`;
+    }
+
+    el.innerHTML = innerHtml;
+    el.style.display = '';
+}
+
+/**
+ * Render general sponsors into the bottom sponsors grid.
+ * @param {Array} sponsors - Array of sponsor objects { name, logo, url }
+ */
+function renderSponsors(sponsors) {
     const grid = document.getElementById('sponsors-grid');
     const section = document.getElementById('sponsors-section');
     if (!grid || !section) return;
 
-    if (!CONFIG.sponsors || CONFIG.sponsors.length === 0) {
+    if (!sponsors || sponsors.length === 0) {
         section.style.display = 'none';
         return;
     }
@@ -105,7 +186,7 @@ function renderSponsors() {
     section.style.display = '';
     grid.innerHTML = '';
 
-    CONFIG.sponsors.forEach(sponsor => {
+    sponsors.forEach(sponsor => {
         const el = document.createElement(sponsor.url ? 'a' : 'div');
         el.className = 'sponsor-item';
         if (sponsor.url) {
@@ -564,6 +645,13 @@ async function fetchSettingsAndRefresh() {
             announcementEl.style.display = 'none';
         }
     }
+
+    // Fetch and render sponsors from the Sponsors sheet tab
+    const sponsorData = await fetchSponsors();
+    renderTierSponsor('presenting-sponsor', sponsorData.presenting, '⭐ Presented by');
+    renderTierSponsor('weighin-sponsor', sponsorData.weighin, '⚖️ Weigh-In Sponsor');
+    renderTierSponsor('junior-sponsor', sponsorData.junior, '🐟 Junior Division Sponsor');
+    renderSponsors(sponsorData.general);
 
     await loadAllData();
 }
