@@ -41,19 +41,42 @@ A live, auto-refreshing leaderboard for catfish tournaments. Officials enter dat
 
    | A (Tier) | B (Name) | C (Logo) | D (URL) |
    |---|---|---|---|
-   | **Tier** | **Name** | **Logo** | **URL** |
-   | presenting | ABC Tackle Co. | images/sponsors/abc.png | https://abctackle.com |
-   | weighin | Fishermans Wharf | images/sponsors/wharf.png | |
-   | junior | Kids Cast Foundation | images/sponsors/kidscast.png | https://kidscast.org |
-   | general | Chestertown Animal Hospital | images/sponsors/cah.png | |
-   | general | Heller the Seller | images/sponsors/heller.png | |
-   | general | Revere Seed | images/sponsors/revere.png | |
+   | **Tier** | **Name** | **Logo URL** | **URL** |
+   | presenting | ABC Tackle Co. | https://lh3.googleusercontent.com/d/FILE_ID_1 | https://abctackle.com |
+   | weighin | Fishermans Wharf | https://lh3.googleusercontent.com/d/FILE_ID_2 | |
+   | junior | Kids Cast Foundation | https://lh3.googleusercontent.com/d/FILE_ID_3 | https://kidscast.org |
+   | general | Chestertown Animal Hospital | https://lh3.googleusercontent.com/d/FILE_ID_4 | |
+   | general | Heller the Seller | https://lh3.googleusercontent.com/d/FILE_ID_5 | |
+   | general | Revere Seed | https://lh3.googleusercontent.com/d/FILE_ID_6 | |
 
    - **Tier values:** `presenting`, `weighin`, `junior`, `general`
    - Only 1 presenting, 1 weighin, 1 junior sponsor (first match wins)
    - Unlimited general sponsors — just add rows
    - Logo (Column C) and URL (Column D) are optional
+   - Logo supports full URLs (Google Drive, etc.) or local paths (`images/sponsors/logo.png`)
    - To remove a sponsor, delete the row or clear the Name column
+
+   #### Using Google Drive for Sponsor Logos
+
+   Instead of uploading logo files to the GitHub repo, you can host them in Google Drive:
+
+   1. Upload the logo image (PNG, JPG, or SVG) to a Google Drive folder
+   2. Right-click the file → **Share** → set to **"Anyone with the link"**
+   3. Copy the share link — it looks like:
+      ```
+      https://drive.google.com/file/d/1Ai9Rdhq8FGHtoLd9kMaEA9E0LFvVDZzq/view?usp=sharing
+      ```
+   4. Extract the **File ID** — the long string between `/d/` and `/view`:
+      ```
+      1Ai9Rdhq8FGHtoLd9kMaEA9E0LFvVDZzq
+      ```
+   5. Build the direct image URL using this format:
+      ```
+      https://lh3.googleusercontent.com/d/1Ai9Rdhq8FGHtoLd9kMaEA9E0LFvVDZzq
+      ```
+   6. Paste this URL into **Column C (Logo)** of the Sponsors tab
+
+   > **⚠️ Important:** Do NOT use `https://drive.google.com/uc?export=view&id=...` — Google now blocks this with an interstitial page. The `lh3.googleusercontent.com/d/` format works reliably.
 
 3. In the **Settings** tab, add key-value settings (Column A = key, Column B = value):
 
@@ -140,8 +163,9 @@ const CONFIG = {
 
 1. Create an `images/` folder in the project directory
 2. Add your tournament banner/logo image (e.g., `images/catfish_tournament_logo.png`)
-3. For sponsors, create `images/sponsors/` and add logo images
-4. Update the file paths in the `CONFIG` section if needed
+3. For sponsor logos, use **Google Drive URLs** (recommended) or local files:
+   - **Google Drive (recommended):** Upload logos to Drive and use `https://lh3.googleusercontent.com/d/FILE_ID` URLs in the Sponsors sheet — see [Using Google Drive for Sponsor Logos](#using-google-drive-for-sponsor-logos)
+   - **Local files:** Create `images/sponsors/` and add logo images, then use relative paths like `images/sponsors/logo.png` in the sheet
 
 ### Step 5: Set Up Google Analytics (Optional)
 
@@ -183,7 +207,7 @@ For the best Facebook sharing preview, edit `index.html` and update these meta t
    - `index.html`
    - `styles.css`
    - `script.js`
-   - `images/` folder (with your banner and sponsor logos)
+   - `images/` folder (with your tournament banner; sponsor logos are optional if using Google Drive URLs)
 3. Go to **Settings > Pages** in your repository
 4. Under "Source," select **Deploy from a branch**
 5. Select `main` branch and `/ (root)` folder
@@ -275,13 +299,13 @@ All sponsors are managed from the **Sponsors** tab in the Google Sheet — no co
 | Tier | Placement on Page | Logo Size | Visual Treatment |
 |---|---|---|---|
 | `presenting` | Below banners, above all leaderboards | Large (200px) | Gold gradient background, "⭐ Presented by" label |
-| `weighin` | Between adult and junior divisions | Medium (140px) | Gray background, "⚖️ Weigh-In Sponsor" label |
+| `weighin` | Bottom of adult division column | Medium (140px) | Gray background, "⚖️ Weigh-In Sponsor" label |
 | `junior` | Inside junior section, above table | Medium (140px) | Green tint, "🐟 Junior Division Sponsor" label |
 | `general` | Bottom of page in grid | Small (100px) | Existing "Our Sponsors" grid |
 
 **To add/change sponsors:**
 1. Open the **Sponsors** tab in Google Sheets
-2. Add or edit a row: `Tier | Name | Logo path | URL`
+2. Add or edit a row: `Tier | Name | Logo URL | URL`
 3. Changes appear on the website within 2 minutes (next auto-refresh)
 
 **To remove a sponsor:** Delete the row or clear the Name column.
@@ -315,10 +339,7 @@ catfish-tournament-leaderboard/
 ├── script.js           # All logic — fetch, parse, sort, render, auto-refresh
 ├── README.md           # This file — setup instructions
 ├── images/             # Tournament images
-│   ├── catfish_tournament_logo.png
-│   └── sponsors/       # Sponsor logos
-│       ├── sponsor1.png
-│       └── sponsor2.png
+│   └── catfish_tournament_logo.png
 └── plans/              # Architecture documentation
     └── catfish-tournament-leaderboard.md
 ```
