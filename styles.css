@@ -153,7 +153,7 @@ body {
 }
 
 .presenting-sponsor .tier-label {
-    font-size: 0.65rem;
+    font-size: 0.8rem;
     font-weight: 800;
     text-transform: uppercase;
     letter-spacing: 3px;
@@ -190,7 +190,7 @@ body {
 }
 
 .weighin-sponsor .tier-label {
-    font-size: 0.6rem;
+    font-size: 0.75rem;
     font-weight: 800;
     text-transform: uppercase;
     letter-spacing: 2px;
