@@ -271,6 +271,13 @@ Change `maxDisplay` in the CONFIG section to control how many entries are shown 
 
 **Junior Division Toggle:** When the Junior Division has more than `maxDisplay` entries, a "▼ Show All (N)" / "▲ Show Top 10" toggle button appears below the table. This lets viewers expand or collapse the full list without affecting the adult categories. The toggle state persists across auto-refreshes.
 
+### Tied Weights
+The leaderboard uses **competition ranking** for ties: anglers with the exact same total weight share the same rank, and the next angler is ranked at the position they would occupy. For example, if two anglers tie for first place, both display rank 1 (🥇), and the next angler displays rank 3.
+
+- Tied entries that fall within `prizeCount` for a category all receive the prize-row highlight (gold, silver, bronze, or blue).
+- If a tournament tiebreaker is needed (e.g., earliest weigh-in time wins), it must be resolved by the officials and reflected in the row order in the Google Sheet — the leaderboard sorts strictly by total weight.
+- Tied weights at the `maxDisplay` cutoff: only entries up to position `maxDisplay` are shown. If positions 10 and 11 are tied at the default cutoff, the 11th does not appear; viewers can use the Junior Division "Show All" toggle to see the full list there.
+
 ### Weight Format
 The parser supports flexible weight formats, including decimals:
 - `12 lbs 8 oz` (recommended)
@@ -306,9 +313,11 @@ All sponsors are managed from the **Sponsors** tab in the Google Sheet — no co
 **To add/change sponsors:**
 1. Open the **Sponsors** tab in Google Sheets
 2. Add or edit a row: `Tier | Name | Logo URL | URL`
-3. Changes appear on the website within 2 minutes (next auto-refresh)
+3. Changes appear on the website within **30 minutes**
 
 **To remove a sponsor:** Delete the row or clear the Name column.
+
+> **Why 30 minutes?** Sponsor data is refreshed less often than leaderboard data to reduce bandwidth, since sponsors rarely change once the tournament starts. The leaderboard, settings, and announcement still refresh every 2 minutes. To pick up sponsor changes immediately, viewers can hard-refresh the page (`Ctrl + Shift + R`).
 
 **Note:** The `CONFIG.sheets.sponsors` URL in `script.js` must be set to the published CSV URL of the Sponsors tab. If the URL is empty, no sponsors will be displayed.
 

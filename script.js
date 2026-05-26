@@ -42,8 +42,11 @@ let refreshTimerId = null;
 
 // Toggle state for Junior Division "Show All" view
 let juniorShowAll = false;
-// Stores full entries per tableId so the toggle can re-render without re-fetching
-let tableData = {};
+
+// Sponsor data rarely changes — refetch on first load and every Nth cycle.
+// At a 2-minute refresh interval, 15 cycles ≈ 30 minutes.
+const SPONSOR_REFRESH_CYCLES = 15;
+let sponsorRefreshCounter = 0;
 
 document.addEventListener('DOMContentLoaded', () => {
     applyConfig();
@@ -104,10 +107,10 @@ async function fetchSponsors() {
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
         const text = await response.text();
 
-        const lines = text.trim().split('\n');
-        // Skip header row (row 1)
-        for (let i = 1; i < lines.length; i++) {
-            const fields = parseCSVLine(lines[i]);
+        const rows = parseCSVRows(text);
+        // Skip header row (row 0)
+        for (let i = 1; i < rows.length; i++) {
+            const fields = rows[i];
             if (fields.length < 2) continue;
 
             const tier = fields[0].trim().toLowerCase();
@@ -137,6 +140,48 @@ async function fetchSponsors() {
 }
 
 /**
+ * Return the input URL only if it uses an allowed protocol (http/https),
+ * otherwise return an empty string. Prevents javascript:, data:, etc.
+ */
+function safeUrl(url) {
+    if (!url) return '';
+    try {
+        const parsed = new URL(url, window.location.href);
+        if (parsed.protocol === 'http:' || parsed.protocol === 'https:') {
+            return parsed.href;
+        }
+    } catch (e) {
+        // Allow relative paths that URL() rejects in some browsers — fall through
+        if (/^[\w./-]+$/.test(url)) return url;
+    }
+    return '';
+}
+
+/**
+ * Build a sponsor logo + name fragment using safe DOM APIs (no innerHTML).
+ * @returns {DocumentFragment}
+ */
+function buildSponsorContent(sponsor) {
+    const frag = document.createDocumentFragment();
+    const logoUrl = safeUrl(sponsor.logo);
+    if (logoUrl) {
+        const img = document.createElement('img');
+        img.className = 'sponsor-logo';
+        img.src = logoUrl;
+        img.alt = sponsor.name || '';
+        img.onerror = function() { this.style.display = 'none'; };
+        frag.appendChild(img);
+    }
+    if (sponsor.name) {
+        const span = document.createElement('span');
+        span.className = 'sponsor-name';
+        span.textContent = sponsor.name;
+        frag.appendChild(span);
+    }
+    return frag;
+}
+
+/**
  * Render a tier sponsor (presenting, weighin, or junior) into its container div.
  * @param {string} elementId - The container element ID
  * @param {Object|null} sponsor - Sponsor object { name, logo, url } or null to hide
@@ -146,26 +191,31 @@ function renderTierSponsor(elementId, sponsor, label) {
     const el = document.getElementById(elementId);
     if (!el) return;
 
+    el.textContent = '';
+
     if (!sponsor || !sponsor.name) {
         el.style.display = 'none';
-        el.innerHTML = '';
         return;
     }
 
-    let contentHtml = '';
-    if (sponsor.logo) {
-        contentHtml += `<img class="sponsor-logo" src="${sponsor.logo}" alt="${sponsor.name}" onerror="this.style.display='none'">`;
-    }
-    contentHtml += `<span class="sponsor-name">${sponsor.name}</span>`;
+    const labelDiv = document.createElement('div');
+    labelDiv.className = 'tier-label';
+    labelDiv.textContent = label;
+    el.appendChild(labelDiv);
 
-    let innerHtml = `<div class="tier-label">${label}</div>`;
-    if (sponsor.url) {
-        innerHtml += `<a class="sponsor-content tier-sponsor-link" href="${sponsor.url}" target="_blank" rel="noopener noreferrer">${contentHtml}</a>`;
-    } else {
-        innerHtml += `<div class="sponsor-content">${contentHtml}</div>`;
+    const sponsorUrl = safeUrl(sponsor.url);
+    const wrapper = document.createElement(sponsorUrl ? 'a' : 'div');
+    wrapper.className = sponsorUrl
+        ? 'sponsor-content tier-sponsor-link'
+        : 'sponsor-content';
+    if (sponsorUrl) {
+        wrapper.href = sponsorUrl;
+        wrapper.target = '_blank';
+        wrapper.rel = 'noopener noreferrer';
     }
+    wrapper.appendChild(buildSponsorContent(sponsor));
+    el.appendChild(wrapper);
 
-    el.innerHTML = innerHtml;
     el.style.display = '';
 }
 
@@ -184,25 +234,18 @@ function renderSponsors(sponsors) {
     }
 
     section.style.display = '';
-    grid.innerHTML = '';
+    grid.textContent = '';
 
     sponsors.forEach(sponsor => {
-        const el = document.createElement(sponsor.url ? 'a' : 'div');
+        const sponsorUrl = safeUrl(sponsor.url);
+        const el = document.createElement(sponsorUrl ? 'a' : 'div');
         el.className = 'sponsor-item';
-        if (sponsor.url) {
-            el.href = sponsor.url;
+        if (sponsorUrl) {
+            el.href = sponsorUrl;
             el.target = '_blank';
             el.rel = 'noopener noreferrer';
         }
-
-        let html = '';
-        if (sponsor.logo) {
-            html += `<img class="sponsor-logo" src="${sponsor.logo}" alt="${sponsor.name}" onerror="this.style.display='none'">`;
-        }
-        if (sponsor.name) {
-            html += `<span class="sponsor-name">${sponsor.name}</span>`;
-        }
-        el.innerHTML = html;
+        el.appendChild(buildSponsorContent(sponsor));
         grid.appendChild(el);
     });
 }
@@ -312,14 +355,14 @@ async function loadLeaderboard(csvUrl, tableId, prizeCount, maxDisplay) {
  * @returns {Array} Array of { name, weight, totalOunces }
  */
 function parseCSV(csvText) {
-    const lines = csvText.trim().split('\n');
-    if (lines.length < 2) return []; // Need at least header + 1 row
+    const rows = parseCSVRows(csvText);
+    if (rows.length < 2) return []; // Need at least header + 1 row
 
     const entries = [];
 
-    // Skip header row (line 0)
-    for (let i = 1; i < lines.length; i++) {
-        const fields = parseCSVLine(lines[i]);
+    // Skip header row (row 0)
+    for (let i = 1; i < rows.length; i++) {
+        const fields = rows[i];
         if (fields.length < 2) continue;
 
         const name = fields[0].trim();
@@ -327,12 +370,10 @@ function parseCSV(csvText) {
 
         if (!name || !weightStr) continue;
 
-        const totalOunces = parseWeight(weightStr);
-
         entries.push({
             name: name,
             weight: weightStr,
-            totalOunces: totalOunces
+            totalOunces: parseWeight(weightStr)
         });
     }
 
@@ -340,43 +381,56 @@ function parseCSV(csvText) {
 }
 
 /**
- * Parse a single CSV line, handling quoted fields
- * @param {string} line - A single line of CSV
- * @returns {Array} Array of field values
+ * Parse a CSV document into an array of rows. Correctly handles quoted
+ * fields containing commas, escaped quotes ("") and embedded newlines.
+ * @param {string} text - Raw CSV text
+ * @returns {Array<Array<string>>} Array of rows, each an array of field values
  */
-function parseCSVLine(line) {
-    const fields = [];
+function parseCSVRows(text) {
+    const rows = [];
+    let row = [];
     let current = '';
     let inQuotes = false;
 
-    for (let i = 0; i < line.length; i++) {
-        const char = line[i];
+    for (let i = 0; i < text.length; i++) {
+        const ch = text[i];
 
         if (inQuotes) {
-            if (char === '"') {
-                if (i + 1 < line.length && line[i + 1] === '"') {
+            if (ch === '"') {
+                if (text[i + 1] === '"') {
                     current += '"';
                     i++; // Skip escaped quote
                 } else {
                     inQuotes = false;
                 }
             } else {
-                current += char;
+                current += ch;
             }
         } else {
-            if (char === '"') {
+            if (ch === '"') {
                 inQuotes = true;
-            } else if (char === ',') {
-                fields.push(current);
+            } else if (ch === ',') {
+                row.push(current);
+                current = '';
+            } else if (ch === '\r') {
+                // ignore — handled by \n
+            } else if (ch === '\n') {
+                row.push(current);
+                rows.push(row);
+                row = [];
                 current = '';
             } else {
-                current += char;
+                current += ch;
             }
         }
     }
 
-    fields.push(current); // Last field
-    return fields;
+    // Flush trailing field/row if the file doesn't end with a newline
+    if (current !== '' || row.length > 0) {
+        row.push(current);
+        rows.push(row);
+    }
+    return rows;
 }
 
 /**
@@ -428,20 +482,27 @@ function parseWeight(weightStr) {
  * @param {string} tableId - Table element ID (used for toggle state)
  */
 function renderTable(tbody, entries, prizeCount, maxDisplay, tableId) {
-    // Store entries for toggle re-rendering (avoids re-fetching)
-    if (tableId) {
-        tableData[tableId] = { entries, prizeCount };
-    }
-
     tbody.innerHTML = '';
 
     const prizeIcons = ['🥇', '🥈', '🥉', '🏅'];
 
+    // Assign competition ranks (1, 1, 3) — tied weights share a rank.
+    // Compute on the full sorted list first so the ranks survive slicing.
+    let lastWeight = null;
+    let lastRank = 0;
+    entries.forEach((entry, idx) => {
+        if (idx === 0 || entry.totalOunces !== lastWeight) {
+            lastRank = idx + 1;
+            lastWeight = entry.totalOunces;
+        }
+        entry.rank = lastRank;
+    });
+
     // Limit to top N entries if configured
     const displayEntries = (maxDisplay > 0) ? entries.slice(0, maxDisplay) : entries;
 
-    displayEntries.forEach((entry, index) => {
-        const rank = index + 1;
+    displayEntries.forEach((entry) => {
+        const rank = entry.rank;
         const tr = document.createElement('tr');
 
         // Add prize row class
@@ -540,6 +601,7 @@ async function fetchSettings() {
         const separator = settingsUrl.includes('?') ? '&' : '?';
         const fetchUrl = `${settingsUrl}${separator}${cacheBuster}`;
         const response = await fetch(fetchUrl, { cache: 'no-store' });
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
         const text = await response.text();
 
         // Parse settings CSV — each row is a key,value pair
@@ -548,11 +610,10 @@ async function fetchSettings() {
         //   status              | live
         //   tournamentName      | 2026 Chester River Catfish Tournament
         //   tournamentDate      | Saturday, August 29th, 2026
-        const lines = text.trim().split('\n');
+        const rows = parseCSVRows(text);
         const settings = {};
 
-        for (const line of lines) {
-            const fields = parseCSVLine(line);
+        for (const fields of rows) {
             if (fields.length >= 2) {
                 const key = fields[0].trim().toLowerCase();
                 const value = fields[1].trim();
@@ -573,9 +634,8 @@ async function fetchSettings() {
         return settings;
     } catch (err) {
         console.warn('Could not fetch settings:', err);
+        return { status: tournamentStatus }; // Keep current status on error
     }
-
-    return { status: tournamentStatus }; // Keep current status on error
 }
 
 /**
@@ -586,7 +646,7 @@ function updateBadge(status) {
     if (!badge) return;
 
     // Remove all state classes
-    badge.classList.remove('before', 'final');
+    badge.classList.remove('before', 'after');
 
     switch (status) {
         case 'before':
@@ -595,7 +655,7 @@ function updateBadge(status) {
             break;
         case 'after':
             badge.textContent = '🏁 FINAL RESULTS (pending polygraphs)';
-            badge.classList.add('final');
+            badge.classList.add('after');
             break;
         case 'live':
         default:
@@ -646,12 +706,15 @@ async function fetchSettingsAndRefresh() {
         }
     }
 
-    // Fetch and render sponsors from the Sponsors sheet tab
-    const sponsorData = await fetchSponsors();
-    renderTierSponsor('presenting-sponsor', sponsorData.presenting, '⭐ Presented by');
-    renderTierSponsor('weighin-sponsor', sponsorData.weighin, '⚖️ Weigh-In Sponsor');
-    renderTierSponsor('junior-sponsor', sponsorData.junior, '🐟 Junior Division Sponsor');
-    renderSponsors(sponsorData.general);
+    // Sponsors rarely change — fetch on first load and every Nth cycle.
+    if (sponsorRefreshCounter === 0) {
+        const sponsorData = await fetchSponsors();
+        renderTierSponsor('presenting-sponsor', sponsorData.presenting, '⭐ Presented by');
+        renderTierSponsor('weighin-sponsor', sponsorData.weighin, '⚖️ Weigh-In Sponsor');
+        renderTierSponsor('junior-sponsor', sponsorData.junior, '🐟 Junior Division Sponsor');
+        renderSponsors(sponsorData.general);
+    }
+    sponsorRefreshCounter = (sponsorRefreshCounter + 1) % SPONSOR_REFRESH_CYCLES;
 
     await loadAllData();
 }
