@@ -272,10 +272,13 @@ Change `maxDisplay` in the CONFIG section to control how many entries are shown 
 **Junior Division Toggle:** When the Junior Division has more than `maxDisplay` entries, a "▼ Show All (N)" / "▲ Show Top 10" toggle button appears below the table. This lets viewers expand or collapse the full list without affecting the adult categories. The toggle state persists across auto-refreshes.
 
 ### Tied Weights
-The leaderboard uses **competition ranking** for ties: anglers with the exact same total weight share the same rank, and the next angler is ranked at the position they would occupy. For example, if two anglers tie for first place, both display rank 1 (🥇), and the next angler displays rank 3.
+**Tournament rule:** if two or more anglers record the exact same weight, the angler who weighed in **first** is the winner.
 
-- Tied entries that fall within `prizeCount` for a category all receive the prize-row highlight (gold, silver, bronze, or blue).
-- If a tournament tiebreaker is needed (e.g., earliest weigh-in time wins), it must be resolved by the officials and reflected in the row order in the Google Sheet — the leaderboard sorts strictly by total weight.
+The leaderboard enforces this automatically as long as officials enter weigh-ins into the Google Sheet in the order they happen:
+
+- Entries are sorted by total weight, descending.
+- When weights are equal, the entry that appears earlier in the Google Sheet (i.e., the one entered first) ranks higher. This is because the sort is stable and preserves the input order on ties.
+- **Officials must enter weigh-ins in chronological order.** Inserting a later weigh-in above an earlier one in the sheet would put the wrong angler ahead on a tie.
 - Tied weights at the `maxDisplay` cutoff: only entries up to position `maxDisplay` are shown. If positions 10 and 11 are tied at the default cutoff, the 11th does not appear; viewers can use the Junior Division "Show All" toggle to see the full list there.
 
 ### Weight Format
@@ -330,11 +333,12 @@ Edit `styles.css` to change colors, fonts, and layout. The design uses a light c
 
 When you update `styles.css` or `script.js` and push to GitHub Pages, browsers may cache the old files. To force a refresh:
 
-1. In `index.html`, increment the `?v=` query parameter on the CSS and JS references:
+1. In `index.html`, increment the `?v=` query parameter on the CSS and JS references. For example, if the current values look like:
    ```html
-   <link rel="stylesheet" href="styles.css?v=22">
-   <script src="script.js?v=18"></script>
+   <link rel="stylesheet" href="styles.css?v=28">
+   <script src="script.js?v=23"></script>
    ```
+   bump them to `?v=29` and `?v=24` (any new number works — the goal is just to change the URL so browsers fetch the new file).
 2. Push the updated `index.html` along with your changed CSS/JS files.
 
 ---

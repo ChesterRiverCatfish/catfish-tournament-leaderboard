@@ -8,7 +8,7 @@
 const CONFIG = {
     // Tournament Info
     tournamentName: "2026 Chester River Catfish Tournament",
-    tournamentDate: "Saturday, August 29th, 2026",                         // e.g., "June 14, 2026"
+    tournamentDate: "Saturday, August 29th, 2026",
     tournamentBanner: "images/catfish_tournament_logo.png",
 
     // Google Sheets CSV URLs
@@ -39,6 +39,12 @@ const CONFIG = {
 // Track current tournament status
 let tournamentStatus = 'live'; // default: 'before', 'live', or 'after'
 let refreshTimerId = null;
+// True after the first successful settings fetch — used to avoid showing
+// a misleading "🔴 LIVE" badge if the very first fetch fails.
+let hasReceivedSettings = false;
+// Guards against overlapping refreshes if a fetch takes longer than the
+// 2-minute interval (e.g., during a Google Sheets slowdown).
+let isRefreshing = false;
 
 // Toggle state for Junior Division "Show All" view
 let juniorShowAll = false;
@@ -100,7 +106,10 @@ async function fetchSponsors() {
     }
 
     try {
-        const cacheBuster = '_cb=' + Date.now();
+        // Bucket to 30-second windows so concurrent viewers share the same URL
+        // and Google's CDN can serve cached responses instead of every request
+        // hitting origin. Still gives near-fresh data on a 2-minute poll cadence.
+        const cacheBuster = '_cb=' + Math.floor(Date.now() / 30000);
         const separator = sponsorsUrl.includes('?') ? '&' : '?';
         const fetchUrl = sponsorsUrl + separator + cacheBuster;
         const response = await fetch(fetchUrl, { cache: 'no-store' });
@@ -298,7 +307,10 @@ async function loadLeaderboard(csvUrl, tableId, prizeCount, maxDisplay) {
 
     try {
         // Add cache-busting parameter to prevent stale cached responses
-        const cacheBuster = '_cb=' + Date.now();
+        // Bucket to 30-second windows so concurrent viewers share the same URL
+        // and Google's CDN can serve cached responses instead of every request
+        // hitting origin. Still gives near-fresh data on a 2-minute poll cadence.
+        const cacheBuster = '_cb=' + Math.floor(Date.now() / 30000);
         const separator = csvUrl.includes('?') ? '&' : '?';
         const fetchUrl = csvUrl + separator + cacheBuster;
 
@@ -486,23 +498,14 @@ function renderTable(tbody, entries, prizeCount, maxDisplay, tableId) {
 
     const prizeIcons = ['🥇', '🥈', '🥉', '🏅'];
 
-    // Assign competition ranks (1, 1, 3) — tied weights share a rank.
-    // Compute on the full sorted list first so the ranks survive slicing.
-    let lastWeight = null;
-    let lastRank = 0;
-    entries.forEach((entry, idx) => {
-        if (idx === 0 || entry.totalOunces !== lastWeight) {
-            lastRank = idx + 1;
-            lastWeight = entry.totalOunces;
-        }
-        entry.rank = lastRank;
-    });
-
-    // Limit to top N entries if configured
+    // Limit to top N entries if configured.
+    // Ties are broken by weigh-in order: entries are listed in the Google
+    // Sheet in the order officials record them, and Array.prototype.sort is
+    // stable, so the angler who weighed in first naturally ranks higher.
     const displayEntries = (maxDisplay > 0) ? entries.slice(0, maxDisplay) : entries;
 
-    displayEntries.forEach((entry) => {
-        const rank = entry.rank;
+    displayEntries.forEach((entry, index) => {
+        const rank = index + 1;
         const tr = document.createElement('tr');
 
         // Add prize row class
@@ -514,7 +517,12 @@ function renderTable(tbody, entries, prizeCount, maxDisplay, tableId) {
         const rankTd = document.createElement('td');
         rankTd.className = 'col-rank';
         if (rank <= prizeCount && rank <= prizeIcons.length) {
-            rankTd.innerHTML = `<span class="rank-icon">${prizeIcons[rank - 1]}</span> ${rank}`;
+            const icon = document.createElement('span');
+            icon.className = 'rank-icon';
+            icon.setAttribute('aria-hidden', 'true');
+            icon.textContent = prizeIcons[rank - 1];
+            rankTd.appendChild(icon);
+            rankTd.appendChild(document.createTextNode(' ' + rank));
         } else {
             rankTd.textContent = rank;
         }
@@ -545,10 +553,14 @@ function renderTable(tbody, entries, prizeCount, maxDisplay, tableId) {
 
         const btn = document.createElement('button');
         btn.className = 'toggle-btn';
-        if (maxDisplay > 0) {
-            btn.textContent = '\u25BC Show All (' + entries.length + ')';
-        } else {
+        // aria-expanded reflects whether the table is currently showing all entries.
+        // maxDisplay > 0 means the table is collapsed to top N; maxDisplay === 0 means expanded.
+        const isExpanded = (maxDisplay === 0);
+        btn.setAttribute('aria-expanded', isExpanded ? 'true' : 'false');
+        if (isExpanded) {
             btn.textContent = '\u25B2 Show Top ' + defaultMax;
+        } else {
+            btn.textContent = '\u25BC Show All (' + entries.length + ')';
         }
         btn.addEventListener('click', function() {
             juniorShowAll = !juniorShowAll;
@@ -597,7 +609,7 @@ async function fetchSettings() {
     }
 
     try {
-        const cacheBuster = `_cb=${Date.now()}`;
+        const cacheBuster = `_cb=${Math.floor(Date.now() / 30000)}`;
         const separator = settingsUrl.includes('?') ? '&' : '?';
         const fetchUrl = `${settingsUrl}${separator}${cacheBuster}`;
         const response = await fetch(fetchUrl, { cache: 'no-store' });
@@ -634,7 +646,7 @@ async function fetchSettings() {
         return settings;
     } catch (err) {
         console.warn('Could not fetch settings:', err);
-        return { status: tournamentStatus }; // Keep current status on error
+        return null;
     }
 }
 
@@ -677,46 +689,64 @@ function updateBadge(status) {
  * Fetch settings, update badge, then load leaderboard data
  */
 async function fetchSettingsAndRefresh() {
-    const settings = await fetchSettings();
-
-    // Update tournament status badge
-    tournamentStatus = settings.status || 'live';
-    updateBadge(tournamentStatus);
-
-    // Apply dynamic settings from the Settings tab (overrides CONFIG defaults)
-    if (settings.tournamentname) {
-        const nameEl = document.getElementById('tournament-name');
-        if (nameEl) nameEl.textContent = settings.tournamentname;
-        document.title = settings.tournamentname + ' — Live Leaderboard';
+    // Skip if a previous refresh is still in flight (e.g., Google is slow).
+    if (isRefreshing) {
+        console.log('Refresh already in progress — skipping this tick.');
+        return;
     }
-    if (settings.tournamentdate) {
-        const dateEl = document.getElementById('tournament-date');
-        if (dateEl) dateEl.textContent = settings.tournamentdate;
-    }
+    isRefreshing = true;
 
-    // Show/hide admin announcement
-    const announcementEl = document.getElementById('admin-announcement');
-    if (announcementEl) {
-        const msg = settings.announcement || '';
-        if (msg.trim()) {
-            announcementEl.textContent = '📢 ' + msg.trim();
-            announcementEl.style.display = '';
-        } else {
-            announcementEl.style.display = 'none';
+    try {
+        const settings = await fetchSettings();
+
+        if (settings) {
+            // Successful fetch — apply settings.
+            hasReceivedSettings = true;
+            tournamentStatus = settings.status || 'live';
+            updateBadge(tournamentStatus);
+
+            if (settings.tournamentname) {
+                const nameEl = document.getElementById('tournament-name');
+                if (nameEl) nameEl.textContent = settings.tournamentname;
+                document.title = settings.tournamentname + ' — Live Leaderboard';
+            }
+            if (settings.tournamentdate) {
+                const dateEl = document.getElementById('tournament-date');
+                if (dateEl) dateEl.textContent = settings.tournamentdate;
+            }
+
+            // Show/hide admin announcement
+            const announcementEl = document.getElementById('admin-announcement');
+            if (announcementEl) {
+                const msg = settings.announcement || '';
+                if (msg.trim()) {
+                    announcementEl.textContent = '📢 ' + msg.trim();
+                    announcementEl.style.display = '';
+                } else {
+                    announcementEl.style.display = 'none';
+                }
+            }
+        } else if (hasReceivedSettings) {
+            // Transient failure on a later refresh — keep showing the last
+            // known status. updateBadge stays as-is.
         }
-    }
+        // First-fetch failure: leave the badge in its hidden "Loading..." state
+        // so viewers don't see a misleading default badge.
 
-    // Sponsors rarely change — fetch on first load and every Nth cycle.
-    if (sponsorRefreshCounter === 0) {
-        const sponsorData = await fetchSponsors();
-        renderTierSponsor('presenting-sponsor', sponsorData.presenting, '⭐ Presented by');
-        renderTierSponsor('weighin-sponsor', sponsorData.weighin, '⚖️ Weigh-In Sponsor');
-        renderTierSponsor('junior-sponsor', sponsorData.junior, '🐟 Junior Division Sponsor');
-        renderSponsors(sponsorData.general);
-    }
-    sponsorRefreshCounter = (sponsorRefreshCounter + 1) % SPONSOR_REFRESH_CYCLES;
+        // Sponsors rarely change — fetch on first load and every Nth cycle.
+        if (sponsorRefreshCounter === 0) {
+            const sponsorData = await fetchSponsors();
+            renderTierSponsor('presenting-sponsor', sponsorData.presenting, '⭐ Presented by');
+            renderTierSponsor('weighin-sponsor', sponsorData.weighin, '⚖️ Weigh-In Sponsor');
+            renderTierSponsor('junior-sponsor', sponsorData.junior, '🐟 Junior Division Sponsor');
+            renderSponsors(sponsorData.general);
+        }
+        sponsorRefreshCounter = (sponsorRefreshCounter + 1) % SPONSOR_REFRESH_CYCLES;
 
-    await loadAllData();
+        await loadAllData();
+    } finally {
+        isRefreshing = false;
+    }
 }
 
 /**
@@ -724,10 +754,16 @@ async function fetchSettingsAndRefresh() {
  */
 function startAutoRefresh() {
     const intervalMs = (CONFIG.refreshInterval || 2) * 60 * 1000;
+    // Stagger the first refresh by 0-15 seconds so concurrent viewers who
+    // open the page at the same moment don't all hit Google in lockstep.
+    // The offset persists through the rest of the session.
+    const jitterMs = Math.floor(Math.random() * 15000);
 
-    refreshTimerId = setInterval(() => {
-        // Always check settings (even in 'after' mode, in case they switch back)
-        console.log('Auto-refreshing leaderboard data...');
+    setTimeout(() => {
         fetchSettingsAndRefresh();
-    }, intervalMs);
+        refreshTimerId = setInterval(() => {
+            console.log('Auto-refreshing leaderboard data...');
+            fetchSettingsAndRefresh();
+        }, intervalMs);
+    }, intervalMs + jitterMs);
 }

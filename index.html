@@ -40,7 +40,7 @@
             <h1 id="tournament-name" class="tournament-name">Catfish Tournament</h1>
             <p id="tournament-date" class="tournament-date"></p>
             <div class="header-status-row">
-                <span id="status-badge" class="live-badge" style="visibility: hidden;">Loading...</span>
+                <span id="status-badge" class="live-badge" style="visibility: hidden;" aria-live="polite" aria-atomic="true">Loading...</span>
                 <span class="last-updated">Updated: <span id="last-updated">Loading...</span></span>
             </div>
         </div>
@@ -57,11 +57,11 @@
 
         <!-- Adult Division -->
         <section class="division adult-division">
-            <h2 class="division-title">🎣 Adult Division</h2>
+            <h2 class="division-title"><span aria-hidden="true">🎣</span> Adult Division</h2>
 
             <!-- Channel Catfish -->
             <div class="category-section">
-                <h3 class="category-title">Channel Catfish <span class="prize-inline">🏆 Top 3 win</span></h3>
+                <h3 class="category-title">Channel Catfish <span class="prize-inline"><span aria-hidden="true">🏆</span> Top 3 win</span></h3>
                 <div class="table-wrapper">
                     <table class="leaderboard-table" id="channel-catfish-table">
                         <thead>
@@ -80,7 +80,7 @@
 
             <!-- Blue/Flathead Catfish -->
             <div class="category-section">
-                <h3 class="category-title">Blue/Flathead Catfish <span class="prize-inline">🏆 Top 3 win</span></h3>
+                <h3 class="category-title">Blue/Flathead Catfish <span class="prize-inline"><span aria-hidden="true">🏆</span> Top 3 win</span></h3>
                 <div class="table-wrapper">
                     <table class="leaderboard-table" id="blue-flathead-table">
                         <thead>
@@ -99,7 +99,7 @@
 
             <!-- 3 Fish Stringer -->
             <div class="category-section">
-                <h3 class="category-title">3 Fish Stringer <span class="prize-inline">🏆 Winner takes all</span></h3>
+                <h3 class="category-title">3 Fish Stringer <span class="prize-inline"><span aria-hidden="true">🏆</span> Winner takes all</span></h3>
                 <div class="table-wrapper">
                     <table class="leaderboard-table" id="stringer-table">
                         <thead>
@@ -122,7 +122,7 @@
 
         <!-- Junior Division -->
         <section class="division junior-division">
-            <h2 class="division-title">🐟 Junior Division <span class="prize-inline">🏆 Top 4 win</span></h2>
+            <h2 class="division-title"><span aria-hidden="true">🐟</span> Junior Division <span class="prize-inline"><span aria-hidden="true">🏆</span> Top 4 win</span></h2>
 
             <!-- Junior Division Sponsor — inside junior section, above table -->
             <div id="junior-sponsor" class="junior-sponsor" style="display: none;"></div>
@@ -159,6 +159,6 @@
         <p class="footer-refresh">Data refreshes automatically every 2 minutes</p>
     </footer>
 
-    <script src="script.js?v=22"></script>
+    <script src="script.js?v=25"></script>
 </body>
 </html>
