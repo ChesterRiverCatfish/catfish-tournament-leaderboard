@@ -125,7 +125,7 @@ A live, auto-refreshing leaderboard for catfish tournaments. Officials enter dat
    ```
    https://docs.google.com/spreadsheets/d/e/2PACX-XXXX.../pub?gid=0&single=true&output=csv
    ```
-4. Repeat for all **5 tabs** (including Settings). Note which URL goes with which tab.
+4. Repeat for all **6 tabs** (including Settings and Sponsors). Note which URL goes with which tab.
 
 ### Step 3: Configure the Leaderboard
 
@@ -145,7 +145,8 @@ const CONFIG = {
         blueFlathead:     "https://docs.google.com/spreadsheets/d/e/.../pub?gid=123456&single=true&output=csv",
         stringer:         "https://docs.google.com/spreadsheets/d/e/.../pub?gid=789012&single=true&output=csv",
         junior:           "https://docs.google.com/spreadsheets/d/e/.../pub?gid=345678&single=true&output=csv",
-        settings:         "https://docs.google.com/spreadsheets/d/e/.../pub?gid=SETTINGS_GID&single=true&output=csv"
+        settings:         "https://docs.google.com/spreadsheets/d/e/.../pub?gid=SETTINGS_GID&single=true&output=csv",
+        sponsors:         "https://docs.google.com/spreadsheets/d/e/.../pub?gid=SPONSORS_GID&single=true&output=csv"
     },
 
     // Refresh interval in minutes
@@ -187,6 +188,8 @@ The page includes Google Analytics GA4 tracking. To use your own:
 
 This tracks real-time visitors, traffic sources (Facebook vs direct), device types, and more.
 
+> **⚠️ Note for forkers/reusers:** The shipped `index.html` contains a real Measurement ID (`G-75SB7MF892`). If you fork or reuse this project as a template, replace it with your own GA4 Measurement ID — or remove the GA snippet entirely — so analytics data doesn't flow to the original owner's property.
+
 ### Step 6: Update Open Graph Meta Tags
 
 For the best Facebook sharing preview, edit `index.html` and update these meta tags:
@@ -199,6 +202,8 @@ For the best Facebook sharing preview, edit `index.html` and update these meta t
 ```
 
 > **Note:** The `og:image` URL must be a full absolute URL for Facebook to display it.
+
+> **Reminder:** The `og:*` and `twitter:*` meta tags in `index.html` are **static** — social-media crawlers do not execute JavaScript, so the dynamic `document.title` update in `script.js` has no effect on link previews. If you rename the tournament, you must manually update the OG and Twitter meta tag values in `index.html` to match.
 
 ### Step 7: Deploy to GitHub Pages
 
@@ -279,7 +284,13 @@ The leaderboard enforces this automatically as long as officials enter weigh-ins
 - Entries are sorted by total weight, descending.
 - When weights are equal, the entry that appears earlier in the Google Sheet (i.e., the one entered first) ranks higher. This is because the sort is stable and preserves the input order on ties.
 - **Officials must enter weigh-ins in chronological order.** Inserting a later weigh-in above an earlier one in the sheet would put the wrong angler ahead on a tie.
-- Tied weights at the `maxDisplay` cutoff: only entries up to position `maxDisplay` are shown. If positions 10 and 11 are tied at the default cutoff, the 11th does not appear; viewers can use the Junior Division "Show All" toggle to see the full list there.
+- Tied weights at the `maxDisplay` cutoff: only entries up to position `maxDisplay` are shown. If positions 10 and 11 are tied at the default cutoff, the 11th entry does not appear on screen.
+
+> **Adult categories vs. Junior Division display behavior:**
+>
+> - **Adult categories** (Channel Catfish, Blue/Flathead, 3 Fish Stringer) display only the top `maxDisplay` (default 10) entries and do **not** have a "Show All" toggle. Only the Junior Division provides that toggle.
+> - The `maxDisplay` cutoff is a **display limit only** — it does NOT affect official prize determination. Prizes are decided by tournament officials from the full Google Sheet data, where every weigh-in (including any tied entries beyond the displayed cutoff) is recorded.
+> - If a tie occurs right at the cutoff in an adult category, the lower-ranked tied angler may not be shown on screen, but this has **no bearing** on the actual prize results. Officials always consult the complete sheet when awarding prizes.
 
 ### Weight Format
 The parser supports flexible weight formats, including decimals:
@@ -335,10 +346,10 @@ When you update `styles.css` or `script.js` and push to GitHub Pages, browsers m
 
 1. In `index.html`, increment the `?v=` query parameter on the CSS and JS references. For example, if the current values look like:
    ```html
-   <link rel="stylesheet" href="styles.css?v=28">
-   <script src="script.js?v=23"></script>
+   <link rel="stylesheet" href="styles.css?v=N">
+   <script src="script.js?v=N"></script>
    ```
-   bump them to `?v=29` and `?v=24` (any new number works — the goal is just to change the URL so browsers fetch the new file).
+   bump each `N` to the next number (e.g., if it's currently `?v=5`, change it to `?v=6`). The actual number doesn't matter — the goal is just to change the URL so browsers fetch the new file instead of serving the cached copy.
 2. Push the updated `index.html` along with your changed CSS/JS files.
 
 ---

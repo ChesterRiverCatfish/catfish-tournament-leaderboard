@@ -277,14 +277,18 @@ async function loadAllData() {
 
     const promises = tasks.map(task => loadLeaderboard(task.url, task.tableId, task.prizeCount, task.maxDisplay));
 
+    let anySuccess = false;
     try {
-        await Promise.allSettled(promises);
+        const results = await Promise.allSettled(promises);
+        anySuccess = results.some(r => r.status === 'fulfilled' && r.value === true);
     } catch (err) {
         console.error('Error loading leaderboard data:', err);
     }
 
-    // Update timestamp
-    updateTimestamp();
+    // Only update timestamp when at least one leaderboard fetch succeeded
+    if (anySuccess) {
+        updateTimestamp();
+    }
 }
 
 /**
@@ -295,14 +299,14 @@ async function loadAllData() {
  */
 async function loadLeaderboard(csvUrl, tableId, prizeCount, maxDisplay) {
     const table = document.getElementById(tableId);
-    if (!table) return;
+    if (!table) return false;
 
     const tbody = table.querySelector('tbody');
 
     // Check if URL is configured
     if (!csvUrl || csvUrl.includes('YOUR_') || csvUrl.includes('_HERE')) {
         tbody.innerHTML = '<tr><td colspan="3" class="empty-message">Configure the Google Sheets CSV URL in script.js</td></tr>';
-        return;
+        return false;
     }
 
     try {
@@ -334,7 +338,7 @@ async function loadLeaderboard(csvUrl, tableId, prizeCount, maxDisplay) {
                 tbody.innerHTML = '<tr><td colspan="3" class="empty-message">🎣 No weigh-ins recorded yet — stay tuned!</td></tr>';
             }
             // If we already have data displayed, keep it and skip this empty update
-            return;
+            return false;
         }
 
         // Sort by weight descending
@@ -342,6 +346,7 @@ async function loadLeaderboard(csvUrl, tableId, prizeCount, maxDisplay) {
 
         // Render
         renderTable(tbody, entries, prizeCount, maxDisplay, tableId);
+        return true;
 
     } catch (err) {
         console.error(`Error loading ${tableId}:`, err);
@@ -353,6 +358,7 @@ async function loadLeaderboard(csvUrl, tableId, prizeCount, maxDisplay) {
         if (!hasRealData) {
             tbody.innerHTML = '<tr><td colspan="3" class="error-message">Unable to load data. Will retry on next refresh.</td></tr>';
         }
+        return false;
     }
 }
 
@@ -590,7 +596,8 @@ function updateTimestamp() {
         hour: 'numeric',
         minute: '2-digit',
         second: '2-digit',
-        hour12: true
+        hour12: true,
+        timeZoneName: 'short'
     };
     el.textContent = now.toLocaleTimeString('en-US', options);
 }
@@ -625,6 +632,8 @@ async function fetchSettings() {
         const rows = parseCSVRows(text);
         const settings = {};
 
+        // The Settings tab must NOT have a header row. Every row is treated as
+        // a key/value pair (Column A = key, Column B = value, starting at row 1).
         for (const fields of rows) {
             if (fields.length >= 2) {
                 const key = fields[0].trim().toLowerCase();
