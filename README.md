@@ -4,10 +4,11 @@ A live, auto-refreshing leaderboard for catfish tournaments. Officials enter dat
 
 ## Features
 
-- **Adult Division** — 3 separate leaderboards:
+- **Adult Division** — 4 separate leaderboards:
   - Channel Catfish (top 3 win prizes 🥇🥈🥉)
   - Blue/Flathead Catfish (top 3 win prizes 🥇🥈🥉)
   - 3 Fish Stringer (winner takes all 🥇)
+  - Women's (winner takes all 🥇)
 - **Junior Division** — 1 combined leaderboard (top 4 win prizes 🥇🥈🥉🏅) with "Show All / Show Top 10" toggle
 - **Top 10 display** — Only the top 10 entries per category/division are shown (configurable); Junior Division includes a toggle to expand all entries
 - **Auto-refresh** every 2 minutes
@@ -29,10 +30,11 @@ A live, auto-refreshing leaderboard for catfish tournaments. Officials enter dat
 ### Step 1: Create the Google Sheet
 
 1. Go to [Google Sheets](https://sheets.google.com) and create a new spreadsheet
-2. Create **6 tabs** (rename the sheet tabs at the bottom):
+2. Create **7 tabs** (rename the sheet tabs at the bottom):
    - `Channel Catfish`
    - `Blue/Flathead Catfish`
    - `3 Fish Stringer`
+   - `Women's`
    - `Junior`
    - `Settings`
    - `Sponsors`
@@ -98,7 +100,7 @@ A live, auto-refreshing leaderboard for catfish tournaments. Officials enter dat
    - `live` → 🔴 LIVE (red pulsing badge) + "⚠️ UNOFFICIAL RESULTS" disclaimer
    - `after` → 🏁 FINAL RESULTS (green badge)
 
-4. In each of the other 4 tabs, add these column headers in **Row 1**:
+4. In each of the other 5 tabs (`Channel Catfish`, `Blue/Flathead Catfish`, `3 Fish Stringer`, `Women's`, `Junior`), add these column headers in **Row 1**:
 
    | A | B |
    |---|---|
@@ -125,7 +127,7 @@ A live, auto-refreshing leaderboard for catfish tournaments. Officials enter dat
    ```
    https://docs.google.com/spreadsheets/d/e/2PACX-XXXX.../pub?gid=0&single=true&output=csv
    ```
-4. Repeat for all **6 tabs** (including Settings and Sponsors). Note which URL goes with which tab.
+4. Repeat for all **7 tabs** (including Settings and Sponsors). Note which URL goes with which tab.
 
 ### Step 3: Configure the Leaderboard
 
@@ -144,6 +146,7 @@ const CONFIG = {
         channelCatfish:   "https://docs.google.com/spreadsheets/d/e/.../pub?gid=0&single=true&output=csv",
         blueFlathead:     "https://docs.google.com/spreadsheets/d/e/.../pub?gid=123456&single=true&output=csv",
         stringer:         "https://docs.google.com/spreadsheets/d/e/.../pub?gid=789012&single=true&output=csv",
+        womens:           "https://docs.google.com/spreadsheets/d/e/.../pub?gid=901234&single=true&output=csv",
         junior:           "https://docs.google.com/spreadsheets/d/e/.../pub?gid=345678&single=true&output=csv",
         settings:         "https://docs.google.com/spreadsheets/d/e/.../pub?gid=SETTINGS_GID&single=true&output=csv",
         sponsors:         "https://docs.google.com/spreadsheets/d/e/.../pub?gid=SPONSORS_GID&single=true&output=csv"
@@ -288,7 +291,7 @@ The leaderboard enforces this automatically as long as officials enter weigh-ins
 
 > **Adult categories vs. Junior Division display behavior:**
 >
-> - **Adult categories** (Channel Catfish, Blue/Flathead, 3 Fish Stringer) display only the top `maxDisplay` (default 10) entries and do **not** have a "Show All" toggle. Only the Junior Division provides that toggle.
+> - **Adult categories** (Channel Catfish, Blue/Flathead, 3 Fish Stringer, Women's) display only the top `maxDisplay` (default 10) entries and do **not** have a "Show All" toggle. Only the Junior Division provides that toggle.
 > - The `maxDisplay` cutoff is a **display limit only** — it does NOT affect official prize determination. Prizes are decided by tournament officials from the full Google Sheet data, where every weigh-in (including any tied entries beyond the displayed cutoff) is recorded.
 > - If a tie occurs right at the cutoff in an adult category, the lower-ranked tied angler may not be shown on screen, but this has **no bearing** on the actual prize results. Officials always consult the complete sheet when awarding prizes.
 
