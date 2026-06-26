@@ -358,6 +358,16 @@ body {
     background: #1a5276;
 }
 
+/* ---------- Women's Category (coral/berry theme) ---------- */
+.womens-category .category-title {
+    background: #fff0f5;            /* blush */
+    border-left-color: #e85d8a;     /* coral */
+}
+
+.womens-category .leaderboard-table thead th {
+    background: #c53078;            /* berry */
+}
+
 .leaderboard-table tbody tr {
     transition: background-color 0.2s ease;
 }
